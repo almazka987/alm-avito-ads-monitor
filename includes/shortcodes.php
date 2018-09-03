@@ -6,19 +6,10 @@
 
 //setlocale(LC_ALL, 'ru_RU.UTF-8');
 
-add_shortcode('alio_avito_block', 'alio_avito_block');
-function alio_avito_block() {
-    $avito_city_option = get_option('aam_avito_city');
-    $avito_keys_option = get_option('aam_avito_keys');
-    $out = '';
 
-    $out .= '<div class="aam-block"><h2>Мониторинг Авито</h2>';
-    $descr_text = ( $avito_city_option && $avito_keys_option ) ? 'Поиск объявлений в г. ' . $avito_city_option . ' по ключевым словам: ' . $avito_keys_option  : 'Город и ключевые слова поиска не заданы!';
-    $out .= '<p class="aam-block-description">' . $descr_text . '</p>';
-    $out .= '<a href="http://fly-journal/wp-admin/options-general.php?page=alio_ads_monitor_settings">Редактировать запрос</a>';
-    if ( $avito_city_option && $avito_keys_option ) {
-        $avito_data = get_check_avito( $avito_city_option, $avito_keys_option )
-    }
+function alio_avito_block() {
+
+
 
 
     $url = 'https://www.avito.ru/omsk?s_trg=3&q=опал';

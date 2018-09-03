@@ -88,56 +88,93 @@ class Alio_Ads_Monitor_Settings {
 	private function settings_fields () {
 
         $settings['avito'] = array(
-            'title'                 => __( 'Мониторинг сайта Avito', 'alio-ads-monitor' ),
-            'description'           => __( 'Настройки для поиска объявлений', 'alio-ads-monitor' ),
+            'title'                 => __( 'Avito Website Monitoring', 'alio-ads-monitor' ),
+            'description'           => __( 'Parsing Settings', 'alio-ads-monitor' ),
             'fields'                => array(
                 array(
+                    'id' 			=> 'avito_enable',
+                    'label'			=> __( 'Enable Avito Ads Monitoring', 'alio-ads-monitor' ),
+                    'description'	=> __( '' ),
+                    'type'			=> 'checkbox',
+                    'default'		=> ''
+                ),
+                array(
                     'id'            => 'avito_city',
-                    'label'         => __( 'Поиск по городу' , 'alio-ads-monitor' ),
+                    'label'         => __( 'Search in City' , 'alio-ads-monitor' ),
                     'type'          => 'text',
-                    'default'       => 'Омск',
+                    'default'       => '',
                     'placeholder'   => '',
                     'description'   => '',
                 ),
                 array(
                     'id'            => 'avito_keys',
-                    'label'         => __( 'Ключевые слова через запятую' , 'alio-ads-monitor' ),
+                    'label'         => __( 'Keywords comma separated' , 'alio-ads-monitor' ),
                     'type'          => 'text',
                     'default'       => '',
                     'placeholder'   => '',
-                    'description'   => 'Например: "Дыня, тыква, клюква"',
+                    'description'   => 'Example: "Dog, cat, bird"',
+                ),
+                array(
+                    'id'            => 'avito_email',
+                    'label'         => __( 'Notify to e-mail:' , 'alio-ads-monitor' ),
+                    'type'          => 'text',
+                    'default'       => '',
+                    'placeholder'   => '',
+                    'description'   => 'Please enter your email address to receive notification in case of success finding new ads according to your request',
                 ),
             )
         );
         $settings['darudar'] = array(
-            'title'                 => __( 'Мониторинг сайта DaruDar', 'alio-ads-monitor' ),
-            'description'           => __( 'Настройки для поиска даров', 'alio-ads-monitor' ),
+            'title'                 => __( 'DaruDar Website Monitoring', 'alio-ads-monitor' ),
+            'description'           => __( 'Parsing Settings', 'alio-ads-monitor' ),
             'fields'                => array(
                 array(
+                    'id' 			=> 'darudar_enable',
+                    'label'			=> __( 'Enable DaruDar Ads Monitoring', 'alio-ads-monitor' ),
+                    'description'	=> __( '' ),
+                    'type'			=> 'checkbox',
+                    'default'		=> ''
+                ),
+                array(
                     'id'            => 'darudar_city',
-                    'label'         => __( 'Поиск по городу' , 'alio-ads-monitor' ),
+                    'label'         => __( 'Search in City' , 'alio-ads-monitor' ),
                     'type'          => 'text',
-                    'default'       => 'Омск',
+                    'default'       => '',
                     'placeholder'   => '',
                     'description'   => '',
                 ),
                 array(
                     'id'            => 'darudar_keys',
-                    'label'         => __( 'Ключевое слово' , 'alio-ads-monitor' ),
+                    'label'         => __( 'Keywords comma separated' , 'alio-ads-monitor' ),
                     'type'          => 'text',
                     'default'       => '',
                     'placeholder'   => '',
-                    'description'   => 'Например: "Дыня, тыква, клюква"',
+                    'description'   => 'Example: "Dog, cat, bird"',
+                ),
+                array(
+                    'id'            => 'darudar_email',
+                    'label'         => __( 'Notify to e-mail:' , 'alio-ads-monitor' ),
+                    'type'          => 'text',
+                    'default'       => '',
+                    'placeholder'   => '',
+                    'description'   => 'Please enter your email address to receive notification in case of success finding new ads according to your request',
                 ),
             )
         );
 		$settings['omskmama'] = array(
-			'title'					=> __( 'Мониторинг сайта Омскмама', 'alio-ads-monitor' ),
-			'description'			=> __( 'Настройки для поиска объявлений', 'alio-ads-monitor' ),
+			'title'					=> __( 'Omskmama Website Monitoring', 'alio-ads-monitor' ),
+			'description'			=> __( 'Parsing Settings', 'alio-ads-monitor' ),
 			'fields'				=> array(
                 array(
+                    'id' 			=> 'omskmama_enable',
+                    'label'			=> __( 'Enable Omskmama Ads Monitoring', 'alio-ads-monitor' ),
+                    'description'	=> '',
+                    'type'			=> 'checkbox',
+                    'default'		=> ''
+                ),
+                array(
                     'id'            => 'omskmama_categories',
-                    'label'         => __( 'Разделы для мониторинга', 'alio-ads-monitor' ),
+                    'label'         => __( 'Select search categories', 'alio-ads-monitor' ),
                     'type'          => 'checkbox_multi',
                     'options'       => array(
                                         '143' => 'Предметы интерьера, ухода, гигиены для детей',
@@ -166,9 +203,17 @@ class Alio_Ads_Monitor_Settings {
                                         '132' => 'Объявления для районов области',
                                     ),
                     'description'   => '',
-                )
-			)
-		);
+                ),
+                array(
+                    'id'            => 'omskmama_email',
+                    'label'         => __( 'Notify to e-mail:' , 'alio-ads-monitor' ),
+                    'type'          => 'text',
+                    'default'       => '',
+                    'placeholder'   => '',
+                    'description'   => 'Please enter your email address to receive notification in case of success finding new ads according to your request',
+                ),
+		    )
+        );
 
 		$settings = apply_filters( $this->parent->_token . '_settings_fields', $settings );
 
