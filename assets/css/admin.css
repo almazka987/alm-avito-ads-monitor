@@ -1,0 +1,48 @@
+#alio_ads_monitor_settings .form-wrap p, #alio_ads_monitor_settings p.description, #alio_ads_monitor_settings p.help, #alio_ads_monitor_settings span.description {
+    display: block;
+}
+
+.last-monitor-holder {
+    width: 100%;
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: #c4d3f6;
+    border-radius: 25px;
+    max-width: 900px;
+}
+
+.last-monitor-holder h2 {
+    padding: 20px;
+    border-bottom: 1px dashed;
+    text-align: center;
+}
+
+.last-monitor-descr {
+    text-align: center;
+}
+
+.last-monitor-table {
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+}
+
+.last-monitor-table .table-header {
+    text-align: center;
+    font-weight: bold;
+}
+
+.last-monitor-table .monitor-item {
+    padding: 20px;
+    border-bottom: 1px solid #fff;
+}
+
+.last-monitor-table .monitor-item.image {
+    text-align: center;
+}
+
+.monitor-item a.exclude-item {
+    color: #FF6699;
+    font-weight: bold;
+}

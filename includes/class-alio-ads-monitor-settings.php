@@ -2,7 +2,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class Alio_Ads_Monitor_Settings {
+class Alio_Ads_Monitor_Settings extends Alio_Ads_Monitor {
 
 	/**
 	 * The single instance of Alio_Ads_Monitor_Settings.
@@ -335,9 +335,39 @@ class Alio_Ads_Monitor_Settings {
 					$html .= '<input name="Submit" type="submit" class="button-primary" value="' . esc_attr( __( 'Save Settings' , 'alio-ads-monitor' ) ) . '" />' . "\n";
 				$html .= '</p>' . "\n";
 			$html .= '</form>' . "\n";
+
+			if ( $tab == 'avito' ) {
+			    $html .= $this->avito_last_monitor_results();
+            }
+
 		$html .= '</div>' . "\n";
 
 		echo $html;
+	}
+
+    /**
+     * Get last Avito parsing data saved in DB
+     * @return string
+     */
+    public function avito_last_monitor_results() {
+        $out = '';
+        $all_data = json_decode( $this->parent->avito_db_data[0]->data, true );
+        $descr_text = ( $this->parent->avito_city_option && $this->parent->avito_keys_option ) ? __( 'Search Ads in ', 'alio-ads-monitor' ) . $this->parent->avito_city_option . __( ' city using keywords: ', 'alio-ads-monitor' ) . $this->parent->avito_keys_option : __( 'City and search keyword was not specified!', 'alio-ads-monitor' );
+        $out .= '<div class="last-monitor-holder"><h2>' . __( 'Last Avito Monitor Results', 'alio-ads-monitor' ) . '</h2>
+        <p class="last-monitor-descr">' . $descr_text . '</p>
+        <table class="last-monitor-table" border="0" cellpadding="0" cellspacing="0" valign="top"><tbody>';
+        foreach( $this->parent->avito_keywords_array as $k_word ) {
+            $out .= '<tr><td class="table-header" colspan="3" bgcolor="#6c7ae0" width="100" height="59">' . __( 'Keyword: ', 'alio-ads-monitor' ) . $k_word . '</td></tr>';
+            if ( !empty( $all_data ) ) {
+                foreach ($all_data as $item_id => $item) {
+                    if ( $item['keyword'] == $k_word ) {
+                        $out .= '<tr><td class="monitor-item image">' . $item['image'] . '</td><td class="monitor-item">' . $item['description'] . '</td><td class="monitor-item"><a href="" class="exclude-item js-avito-exclude" data-exclude-id="' . $item_id . '">Exclude item from monitoring</a></td></tr>';
+                    }
+                }
+            }
+        }
+        $out .= '</tbody></table></div>';
+        return $out;
 	}
 
 	/**

@@ -13,14 +13,6 @@ class Alio_Ads_Monitor {
 	private static $_instance = null;
 
 	/**
-	 * Settings class object
-	 * @var     object
-	 * @access  public
-	 * @since   1.0.0
-	 */
-	public $settings = null;
-
-	/**
 	 * The version number.
 	 * @var     string
 	 * @access  public
@@ -71,15 +63,15 @@ class Alio_Ads_Monitor {
 	/**
 	 * The plugin necessary Avito options
 	 * @var     array
-	 * @access  private
+	 * @access  public
 	 * @since   1.0.0
 	 */
-	private $avito_enable_option;
-    private $avito_city_option;
-    private $avito_email_option;
-    private $avito_keys_option;
-    private $avito_keywords_array;
-    private $avito_db_data;
+	public $avito_enable_option;
+    public $avito_city_option;
+    public $avito_email_option;
+    public $avito_keys_option;
+    public $avito_keywords_array;
+    public $avito_db_data;
 
 	/**
 	 * Constructor function.
@@ -112,9 +104,9 @@ class Alio_Ads_Monitor {
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ), 10 );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ), 10 );
 
-        add_shortcode('alio_avito_block', array( $this, 'alio_avito_block' ) );
-        add_shortcode('alio_darudar_block', array( $this, 'alio_darudar_block' ) );
-        add_shortcode('alio_omskmama_block', array( $this, 'alio_omskmama_block' ) );
+        // Load admin JS & CSS
+        add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ), 10, 1 );
+        add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_styles' ), 10, 1 );
 
 		// Load API for generic admin functions
 		if ( is_admin() ) {
@@ -153,6 +145,28 @@ class Alio_Ads_Monitor {
 		wp_enqueue_script( $this->_token . '-frontend' );
 	} // End enqueue_scripts ()
 
+    /**
+     * Load admin CSS.
+     * @access  public
+     * @since   1.0.0
+     * @return  void
+     */
+    public function admin_enqueue_styles ( $hook = '' ) {
+        wp_register_style( $this->_token . '-admin', esc_url( $this->assets_url ) . 'css/admin.css', array(), $this->_version );
+        wp_enqueue_style( $this->_token . '-admin' );
+    } // End admin_enqueue_styles ()
+
+    /**
+     * Load admin Javascript.
+     * @access  public
+     * @since   1.0.0
+     * @return  void
+     */
+    public function admin_enqueue_scripts ( $hook = '' ) {
+        wp_register_script( $this->_token . '-admin', esc_url( $this->assets_url ) . 'js/admin.js', array( 'jquery' ), $this->_version );
+        wp_enqueue_script( $this->_token . '-admin' );
+    } // End admin_enqueue_scripts ()
+
 	/**
 	 * Load plugin localisation
 	 * @access  public
@@ -167,7 +181,7 @@ class Alio_Ads_Monitor {
      * Create plugin DB table
      * @return void
      */
-    public function db_install() {
+    private function db_install() {
         global $wpdb;
         $wpdb->show_errors( true );
         $table_name = $wpdb->prefix . "alio_ads_monitor";
@@ -179,6 +193,7 @@ class Alio_Ads_Monitor {
             site tinytext NOT NULL,
             data longtext NOT NULL,
             new_data longtext NOT NULL,
+            exclude_items text NOT NULL,
             PRIMARY KEY  (id)
             ) $charset_collate;";
 
@@ -191,44 +206,6 @@ class Alio_Ads_Monitor {
         $wpdb->show_errors( true );
         $this->avito_db_data = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM ' . $wpdb->prefix . 'alio_ads_monitor WHERE site="%s"', 'avito' ) );
     }
-
-    /**
-     * Shortcode Avito frontend info
-     * @return void
-     */
-    public function alio_avito_block() {
-
-$lol = 'lol';
-
-        $out = '';
-        $out .= '<div class="aam-block"><h2>' . __( 'Avito Monitoring', 'alio-ads-monitor' ) . '</h2>';
-        if ( !$this->avito_enable_option ) {
-            $descr_text = __( 'Avito site monitoring is not activated!', 'alio-ads-monitor' );
-        } else {
-            $descr_text = ( $this->avito_city_option && $this->avito_keys_option ) ? __( 'Search Ads in ', 'alio-ads-monitor' ) . $this->avito_city_option . __( ' city using keywords: ', 'alio-ads-monitor' ) . $this->avito_keys_option : __( 'City and search keyword was not specified!', 'alio-ads-monitor' );
-        }
-        $out .= '<p class="aam-block-description">' . $descr_text . '</p>';
-        $out .= '<a href="http://fly-journal/wp-admin/options-general.php?page=alio_ads_monitor_settings">' . __( 'Go to Settings Page', 'alio-ads-monitor' ) . '</a>';
-
-/*            foreach (...) {
-                $out .= '<div class="aam-results-block"><span>' . __( 'Search results for ', 'alio-ads-monitor' ) . $keyword . '</span>';
-                $out .= '<span class="aam-results-last-date">' . __( 'The last monitoring was held ', 'alio-ads-monitor' ) . $lol . '</span>';
-                $out .= '<div class="aam-avito-results-table">here result table</div>';
-                $out .= '</div>';
-        }*/
-    }
-
-    /**
-     * Shortcode Darudar frontend info
-     * @return void
-     */
-    public function alio_darudar_block() {}
-
-    /**
-     * Shortcode Omskmama frontend info
-     * @return void
-     */
-    public function alio_omskmama_block() {}
 
     /**
      * Clear spaces, lowercase helper
@@ -345,16 +322,16 @@ error_log(print_R($new_data, true));
         $msg  = '';
         $descr_text = ( $this->avito_city_option && $this->avito_keys_option ) ? __( 'Search Ads in ', 'alio-ads-monitor' ) . $this->avito_city_option . __( ' city using keywords: ', 'alio-ads-monitor' ) . $this->avito_keys_option : __( 'City and search keyword was not specified!', 'alio-ads-monitor' );
         $msg .= '<div style="text-align: right;"><a href="' . get_site_url() . '/wp-admin/options-general.php?page=alio_ads_monitor_settings" target="blank">' . __( 'Go to Settings Page to customize settings', 'alio-ads-monitor' ) . '</a></div>
-        <div width="100%" height="100%" cellspacing="0" cellpadding="0" bgcolor="#c4d3f6" border="0" style="width:100%;min-height:100%;margin:0;padding:0;background-color:#eeeeee;border-radius: 25px;" valign="top">
+        <div style="width:100%;min-height:100%;margin:0;padding:0;background-color:#eeeeee;border-radius: 25px;">
         <h2 style="padding: 20px;border-bottom: 1px dashed;text-align: center;">' . __( 'Avito Monitoring', 'alio-ads-monitor' ) . '</h2>
         <p style="text-align: center;">' . $descr_text . '</p>
-        <table border="0" cellpadding="0" cellspacing="0" valign="top" style="margin-left:auto;margin-right:auto;"><tbody>';
+        <table border="0" cellpadding="0" cellspacing="0" valign="top" style="margin-left:auto;margin-right:auto;width: 100%;"><tbody>';
         foreach( $this->avito_keywords_array as $k_word ) {
             $msg .= '<tr><td colspan="2" bgcolor="#6c7ae0" width="100" height="59" style="text-align: center;font-weight: bold;">' . __( 'Keyword: ', 'alio-ads-monitor' ) . $k_word . '</td></tr>';
             if ( !empty( $new_data ) ) {
                 foreach ($new_data as $new_item_arr) {
                     if ( $new_item_arr['keyword'] == $k_word ) {
-                        $msg .= '<tr bgcolor="#c4d3f6"><td style="padding: 20px;border-bottom: 1px solid #fff;text-align: center;">' . $new_item_arr['image'] . '</td><td style="padding: 20px;border-bottom: 1px solid #fff;">' . $new_item_arr['description'] . '</td></tr>';
+                        $msg .= '<tr style="background: #c4d3f6;"><td style="padding: 20px;border-bottom: 1px solid #fff;text-align: center;">' . $new_item_arr['image'] . '</td><td style="padding: 20px;border-bottom: 1px solid #fff;">' . $new_item_arr['description'] . '</td></tr>';
                     }
                 }
             }

@@ -66,14 +66,14 @@ msgstr "Результаты "
 msgid "The last monitoring was held "
 msgstr "Последняя проверка проводилась "
 
-msgid "Keyword: "
-msgstr "Ключевое слово: "
+msgid "New Ads by Keyword: "
+msgstr "Новые объявления по ключевому слову: "
 
 msgid "Go to Settings Page to customize settings"
 msgstr "Перейти на страницу настроек для изменения настроек"
 
-msgid ""
-msgstr ""
+msgid "Exclude item from monitoring"
+msgstr "Исключить из отслеживания"
 
-msgid ""
-msgstr ""
+msgid "Last Avito Monitor Results"
+msgstr "Последние результаты мониторинга Авито"
