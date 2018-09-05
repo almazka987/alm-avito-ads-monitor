@@ -69,11 +69,14 @@ msgstr "Последняя проверка проводилась "
 msgid "New Ads by Keyword: "
 msgstr "Новые объявления по ключевому слову: "
 
-msgid "Go to Settings Page to customize settings"
-msgstr "Перейти на страницу настроек для изменения настроек"
+msgid "Go to Settings Page to customize settings or exclude items"
+msgstr "Перейти на страницу для настройки или исключения пунтов"
 
 msgid "Exclude item from monitoring"
 msgstr "Исключить из отслеживания"
 
 msgid "Last Avito Monitor Results"
 msgstr "Последние результаты мониторинга Авито"
+
+msgid "Last Parsing "
+msgstr "Дата сканирования"

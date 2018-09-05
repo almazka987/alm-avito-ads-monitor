@@ -100,10 +100,6 @@ class Alio_Ads_Monitor {
         register_activation_hook( $this->file, array( $this, 'alio_cron_activation' ) );
         register_deactivation_hook( $this->file, array( $this, 'alio_cron_deactivation' ) );
 
-		// Load frontend JS & CSS
-		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ), 10 );
-		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ), 10 );
-
         // Load admin JS & CSS
         add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ), 10, 1 );
         add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_styles' ), 10, 1 );
@@ -122,28 +118,6 @@ class Alio_Ads_Monitor {
 		// Start searching
         $this->load_searching();
 	} // End __construct ()
-
-	/**
-	 * Load frontend CSS.
-	 * @access  public
-	 * @since   1.0.0
-	 * @return void
-	 */
-	public function enqueue_styles () {
-		wp_register_style( $this->_token . '-frontend', esc_url( $this->assets_url ) . 'css/frontend.css', array(), $this->_version );
-		wp_enqueue_style( $this->_token . '-frontend' );
-	} // End enqueue_styles ()
-
-	/**
-	 * Load frontend Javascript.
-	 * @access  public
-	 * @since   1.0.0
-	 * @return  void
-	 */
-	public function enqueue_scripts () {
-		wp_register_script( $this->_token . '-frontend', esc_url( $this->assets_url ) . 'js/frontend.js', array( 'jquery' ), $this->_version );
-		wp_enqueue_script( $this->_token . '-frontend' );
-	} // End enqueue_scripts ()
 
     /**
      * Load admin CSS.
@@ -165,7 +139,14 @@ class Alio_Ads_Monitor {
     public function admin_enqueue_scripts ( $hook = '' ) {
         wp_register_script( $this->_token . '-admin', esc_url( $this->assets_url ) . 'js/admin.js', array( 'jquery' ), $this->_version );
         wp_enqueue_script( $this->_token . '-admin' );
+        $this->load_ajax_scripts();
     } // End admin_enqueue_scripts ()
+
+    public function load_ajax_scripts() {
+        wp_localize_script( 'jquery', 'ajaxUrl', array(
+            'url' => admin_url( 'admin-ajax.php' )
+        ) );
+    }
 
 	/**
 	 * Load plugin localisation
@@ -233,7 +214,7 @@ class Alio_Ads_Monitor {
      * @return array
      */
     function get_keys_array( $str = '' ) {
-        $k_array = explode( ',', $this->clear( $str ) );
+        $k_array = explode( ',', $this->clear( $str ), -1 );
         return $k_array;
     }
 
@@ -247,16 +228,22 @@ class Alio_Ads_Monitor {
         $avito_monitor_data = array();
         $search_date = time();
 
-        foreach ($this->avito_keywords_array as $key) {
+        foreach ( $this->avito_keywords_array as $key ) {
             $url = 'https://www.avito.ru/' . $city . '?s_trg=3&q=' . $key;
             $file = file_get_contents( $url );
             if ( $doc = phpQuery::newDocumentHTML( $file, 'utf-8' ) ) {
                 foreach ($doc->find('div.item.item_table') as $item_table) {
                     $item_table = pq($item_table);
                     $avito_item_id = $item_table->attr('id');
+
+                    $excludes_from_db = $this->avito_db_data[0]->exclude_items;
+                    $exclude_arr = ( !empty( $excludes_from_db ) ) ? json_decode( $excludes_from_db, true ) : array();
+                    if ( !empty( $exclude_arr ) && in_array( $avito_item_id, $exclude_arr ) ) continue;
                     $bad_symbols = array('background-image: url(', ')', ';');
                     $img_from_ul_style = $item_table->find('a.large-picture .item-slider-list .item-slider-item:eq(0) div.item-slider-image')->attr('style');
                     $img_from_ul_srcpath = $item_table->find('a.large-picture .item-slider-list .item-slider-item:eq(0) div.item-slider-image')->attr('data-srcpath');
+                    $img_from_a = $item_table->find('a.large-picture > img.large-picture')->attr('data-srcpath');
+
                     $item_title = $item_table->find('div.item_table-header > h3 > a span')->text();
                     $item_link = $item_table->find('div.item_table-header > h3 > a')->attr('href');
                     if ( $item_link ) {
@@ -266,16 +253,14 @@ class Alio_Ads_Monitor {
 
                     if ( $img_from_ul_style && !$img_from_ul_srcpath ) {
                         $img_from_ul_style = 'http:' . str_replace( $bad_symbols, '', $img_from_ul_style );
-                        $avito_monitor_data[$avito_item_id]['image'] = '<img alt="" src="' . $img_from_ul_style . '" style="min-width: 208px;">';
+                        $avito_monitor_data[$avito_item_id]['image'] = '<img alt="" src="' . $img_from_ul_style . '">';
                     } elseif ( $img_from_ul_srcpath ) {
-                        $img_from_ul_srcpath = 'http:' . $img_from_ul_srcpath;
-                            $avito_monitor_data[$avito_item_id]['image'] = '<img alt="" src="' . $img_from_ul_srcpath . '" style="min-width: 208px;">';
-                    }
-                    else {
-                        $avito_monitor_data[$avito_item_id]['image'] = $item_table->find('a.large-picture')->html();
+                            $avito_monitor_data[$avito_item_id]['image'] = '<img alt="" src="http:' . $img_from_ul_srcpath . '">';
+                    } elseif ( $img_from_a ) {
+                            $avito_monitor_data[$avito_item_id]['image'] = '<img alt="" src="http:' . $img_from_a . '">';
                     }
                     $avito_monitor_data[$avito_item_id]['keyword'] = $key;
-                    $avito_monitor_data[$avito_item_id]['description'] = '<div><h3><a href="' . $item_link . '">' . $item_title. '</a></h3>' . $item_price . '</div>';
+                    $avito_monitor_data[$avito_item_id]['description'] = '<div><h3><a href="' . $item_link . '" target="blank">' . $item_title. '</a></h3>' . $item_price . '</div>';
                 }
             }
         }
@@ -321,7 +306,7 @@ error_log(print_R($new_data, true));
         $other_data = array_diff_key( $all_data, $new_data );
         $msg  = '';
         $descr_text = ( $this->avito_city_option && $this->avito_keys_option ) ? __( 'Search Ads in ', 'alio-ads-monitor' ) . $this->avito_city_option . __( ' city using keywords: ', 'alio-ads-monitor' ) . $this->avito_keys_option : __( 'City and search keyword was not specified!', 'alio-ads-monitor' );
-        $msg .= '<div style="text-align: right;"><a href="' . get_site_url() . '/wp-admin/options-general.php?page=alio_ads_monitor_settings" target="blank">' . __( 'Go to Settings Page to customize settings', 'alio-ads-monitor' ) . '</a></div>
+        $msg .= '<div style="text-align: right;"><a href="' . get_site_url() . '/wp-admin/options-general.php?page=alio_ads_monitor_settings" target="blank">' . __( 'Go to Settings Page to customize settings or exclude items', 'alio-ads-monitor' ) . '</a></div>
         <div style="width:100%;min-height:100%;margin:0;padding:0;background-color:#eeeeee;border-radius: 25px;">
         <h2 style="padding: 20px;border-bottom: 1px dashed;text-align: center;">' . __( 'Avito Monitoring', 'alio-ads-monitor' ) . '</h2>
         <p style="text-align: center;">' . $descr_text . '</p>
@@ -344,9 +329,9 @@ error_log(print_R($new_data, true));
         $msg .= '</tbody></table></div>';
         $subject = "Avito Parsing Info";
         $headers = "Content-Type: text/html \r\n From: Alio Ads Monitor <noanswer@". $_SERVER['HTTP_HOST'] .">" . "\r\n";
-        $result = wp_mail( $this->avito_email_option, $subject, $msg, $headers );
-error_log(print_R('email send?', true));
-error_log(print_R($result, true));
+        //$result = wp_mail( $this->avito_email_option, $subject, $msg, $headers );
+//error_log(print_R('email send?', true));
+//error_log(print_R($result, true));
     }
 
     /**

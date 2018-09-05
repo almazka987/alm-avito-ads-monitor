@@ -22,6 +22,20 @@
     text-align: center;
 }
 
+.last-monitor-wrapper {
+    position: relative;
+}
+
+.last-monitor-loader {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255,255,255, .8);
+}
+
 .last-monitor-table {
     margin-left: auto;
     margin-right: auto;
@@ -38,6 +52,11 @@
     border-bottom: 1px solid #fff;
 }
 
+.last-monitor-table .footer-block .monitor-item {
+    padding: 20px;
+    border-bottom: none;
+}
+
 .last-monitor-table .monitor-item.image {
     text-align: center;
 }
@@ -45,4 +64,21 @@
 .monitor-item a.exclude-item {
     color: #FF6699;
     font-weight: bold;
+}
+
+.monitor-item a.exclude-item:focus {
+    box-shadow: none;
+    outline: 0;
+}
+
+.monitor-item a.exclude-item:hover {
+    color: white;
+}
+
+.monitor-item .bulk-checkbox-holder {
+    margin-top: 15px;
+}
+
+.bulk-checkbox-holder .bulk-checkbox-title {
+    margin-right: 10px;
 }

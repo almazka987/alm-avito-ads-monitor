@@ -52,6 +52,9 @@ class Alio_Ads_Monitor_Settings extends Alio_Ads_Monitor {
 
 		// Add settings link to plugins page
 		add_filter( 'plugin_action_links_' . plugin_basename( $this->parent->file ) , array( $this, 'add_settings_link' ) );
+
+        add_action( 'wp_ajax_nopriv_exclude_avito_item', array( $this, 'exclude_avito_item' ) );
+        add_action( 'wp_ajax_exclude_avito_item', array( $this, 'exclude_avito_item' ) );
 	}
 
 	/**
@@ -336,7 +339,7 @@ class Alio_Ads_Monitor_Settings extends Alio_Ads_Monitor {
 				$html .= '</p>' . "\n";
 			$html .= '</form>' . "\n";
 
-			if ( $tab == 'avito' ) {
+			if ( $tab == 'avito' || !$tab ) {
 			    $html .= $this->avito_last_monitor_results();
             }
 
@@ -346,27 +349,66 @@ class Alio_Ads_Monitor_Settings extends Alio_Ads_Monitor {
 	}
 
     /**
+     * Ajax exclude avito item from monitor
+     */
+    public function exclude_avito_item() {
+        if ( !empty( $this->parent->avito_db_data ) ) {
+            $excludes_from_db = $this->parent->avito_db_data[0]->exclude_items;
+            $exclude_arr = ( !empty( $excludes_from_db ) ) ? json_decode( $excludes_from_db, true ) : array();
+            $exclude_id = ( !empty( $_POST['itemID'] ) ) ? $_POST['itemID'] : false;
+            $exclude_ids = ( !empty( $_POST['excludeIDs'] ) && is_array( $_POST['excludeIDs'] ) ) ? $_POST['excludeIDs'] : false ;
+                $res = '';
+
+            if ( $exclude_id ) {
+                $exclude_arr[] = $exclude_id;
+                $res = 1;
+            }
+            if ( $exclude_ids ) {
+                foreach ( $exclude_ids as $item ) {
+                    $exclude_arr[] = $item;
+                }
+                $res = json_encode( $exclude_ids, JSON_UNESCAPED_UNICODE );
+            }
+            global $wpdb;
+                $wpdb->show_errors( true );
+                $wpdb->update( $wpdb->prefix . 'alio_ads_monitor', array(
+                    'exclude_items' => json_encode( $exclude_arr, JSON_UNESCAPED_UNICODE )
+                ), array('id' => $this->parent->avito_db_data[0]->id) );
+                $this->parent->upd_avito_db_data();
+                echo $res;
+        }
+        wp_die();
+    }
+
+    /**
      * Get last Avito parsing data saved in DB
      * @return string
      */
     public function avito_last_monitor_results() {
         $out = '';
         $all_data = json_decode( $this->parent->avito_db_data[0]->data, true );
+        $keywords = $this->parent->avito_keywords_array;
         $descr_text = ( $this->parent->avito_city_option && $this->parent->avito_keys_option ) ? __( 'Search Ads in ', 'alio-ads-monitor' ) . $this->parent->avito_city_option . __( ' city using keywords: ', 'alio-ads-monitor' ) . $this->parent->avito_keys_option : __( 'City and search keyword was not specified!', 'alio-ads-monitor' );
         $out .= '<div class="last-monitor-holder"><h2>' . __( 'Last Avito Monitor Results', 'alio-ads-monitor' ) . '</h2>
-        <p class="last-monitor-descr">' . $descr_text . '</p>
-        <table class="last-monitor-table" border="0" cellpadding="0" cellspacing="0" valign="top"><tbody>';
-        foreach( $this->parent->avito_keywords_array as $k_word ) {
-            $out .= '<tr><td class="table-header" colspan="3" bgcolor="#6c7ae0" width="100" height="59">' . __( 'Keyword: ', 'alio-ads-monitor' ) . $k_word . '</td></tr>';
-            if ( !empty( $all_data ) ) {
-                foreach ($all_data as $item_id => $item) {
-                    if ( $item['keyword'] == $k_word ) {
-                        $out .= '<tr><td class="monitor-item image">' . $item['image'] . '</td><td class="monitor-item">' . $item['description'] . '</td><td class="monitor-item"><a href="" class="exclude-item js-avito-exclude" data-exclude-id="' . $item_id . '">Exclude item from monitoring</a></td></tr>';
+        <p class="last-monitor-descr">' . $descr_text . '</p>';
+        if ( !empty( $this->parent->avito_db_data[0]->search_date ) ) {
+            $out .= '<p class="last-monitor-descr">Last Parsing ' . $this->parent->avito_db_data[0]->search_date . '</p>';
+        }
+        $out .= '<div class="last-monitor-wrapper"><div class="last-monitor-loader"></div><table class="last-monitor-table" border="0" cellpadding="0" cellspacing="0" valign="top"><tbody>';
+        if ( !empty( $keywords ) ) {
+            foreach( $keywords as $k_word ) {
+                $out .= '<tr><td class="table-header" colspan="3" bgcolor="#6c7ae0" width="100" height="59">' . __( 'Keyword: ', 'alio-ads-monitor' ) . $k_word . '</td></tr>';
+                if ( !empty( $all_data ) ) {
+                    foreach ($all_data as $item_id => $item) {
+                        if ( $item['keyword'] == $k_word ) {
+                            $out .= '<tr class="item-block item' . $item_id . '"><td class="monitor-item image">' . $item['image'] . '</td><td class="monitor-item">' . $item['description'] . '</td><td class="monitor-item"><a href="" class="exclude-item js-avito-exclude" data-exclude-id="' . $item_id . '">Exclude item from monitoring</a><div class="bulk-checkbox-holder"><h3>or</h3><label class="checkcontainer"><span class="bulk-checkbox-title">bulk exclude</span><input type="checkbox" name="bulk-exclude-checks" data-exclude-id="' . $item_id . '"></label></div></td></tr>';
+                        }
                     }
                 }
             }
         }
-        $out .= '</tbody></table></div>';
+        $out .= '<tr class="footer-block"><td></td><td></td><td class="monitor-item"><button class="button-primary js-bulk-avito-exclude">Bulk Exclude Items</button></td></tr>';
+        $out .= '</tbody></table></div></div>';
         return $out;
 	}
 
