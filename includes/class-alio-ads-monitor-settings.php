@@ -389,26 +389,30 @@ class Alio_Ads_Monitor_Settings extends Alio_Ads_Monitor {
         $all_data = json_decode( $this->parent->avito_db_data[0]->data, true );
         $keywords = $this->parent->avito_keywords_array;
         $descr_text = ( $this->parent->avito_city_option && $this->parent->avito_keys_option ) ? __( 'Search Ads in ', 'alio-ads-monitor' ) . $this->parent->avito_city_option . __( ' city using keywords: ', 'alio-ads-monitor' ) . $this->parent->avito_keys_option : __( 'City and search keyword was not specified!', 'alio-ads-monitor' );
-        $out .= '<div class="last-monitor-holder"><h2>' . __( 'Last Avito Monitor Results', 'alio-ads-monitor' ) . '</h2>
+
+        $out .= '<div class="last-monitor-holder"><div class="title-block"><h2>' . __( 'Last Avito Monitor Results', 'alio-ads-monitor' ) . '</h2>
         <p class="last-monitor-descr">' . $descr_text . '</p>';
         if ( !empty( $this->parent->avito_db_data[0]->search_date ) ) {
             $out .= '<p class="last-monitor-descr">Last Parsing ' . $this->parent->avito_db_data[0]->search_date . '</p>';
         }
-        $out .= '<div class="last-monitor-wrapper"><div class="last-monitor-loader"></div><table class="last-monitor-table" border="0" cellpadding="0" cellspacing="0" valign="top"><tbody>';
+        $out .= '</div><div class="last-monitor-wrapper"><div class="last-monitor-loader"></div>';
+
         if ( !empty( $keywords ) ) {
             foreach( $keywords as $k_word ) {
-                $out .= '<tr><td class="table-header" colspan="3" bgcolor="#6c7ae0" width="100" height="59">' . __( 'Keyword: ', 'alio-ads-monitor' ) . $k_word . '</td></tr>';
+                $out .= '<div class="table-header"><h4 class="keyword-heading">' . __( 'Keyword: ', 'alio-ads-monitor' ) . $k_word . '</h4></div>';
+                $out .= '<div class="table-scrolling-container"><div class="last-monitor-table" data-keyword="' . $k_word . '">';
                 if ( !empty( $all_data ) ) {
                     foreach ($all_data as $item_id => $item) {
                         if ( $item['keyword'] == $k_word ) {
-                            $out .= '<tr class="item-block item' . $item_id . '"><td class="monitor-item image">' . $item['image'] . '</td><td class="monitor-item">' . $item['description'] . '</td><td class="monitor-item"><a href="" class="exclude-item js-avito-exclude" data-exclude-id="' . $item_id . '">Exclude item from monitoring</a><div class="bulk-checkbox-holder"><h3>or</h3><label class="checkcontainer"><span class="bulk-checkbox-title">bulk exclude</span><input type="checkbox" name="bulk-exclude-checks" data-exclude-id="' . $item_id . '"></label></div></td></tr>';
+                            $out .= '<div class="row item-block item' . $item_id . '"><div class="cell monitor-item image">' . $item['image'] . '</div><div class="cell monitor-item">' . $item['description'] . '</div><div class="cell monitor-item"><a href="" class="exclude-item js-avito-exclude" data-exclude-id="' . $item_id . '">Exclude item from monitoring</a><div class="bulk-checkbox-holder"><h3>or</h3><label class="checkcontainer"><span class="bulk-checkbox-title">bulk exclude</span><input type="checkbox" name="bulk-exclude-checks" data-exclude-id="' . $item_id . '"></label></div></div></div>';
                         }
                     }
                 }
+                $out .= '</div><!-- End Last monitor table --></div>';
             }
         }
-        $out .= '<tr class="footer-block"><td></td><td></td><td class="monitor-item"><button class="button-primary js-bulk-avito-exclude">Bulk Exclude Items</button></td></tr>';
-        $out .= '</tbody></table></div></div>';
+        $out .= '<div class="footer-block last-monitor-option-table"><div class="row"><div class="cell"></div><div class="cell"></div><div class="cell"><button class="button-primary js-bulk-avito-exclude">Bulk Exclude Items</button></div></div></div>';
+        $out .= '</div></div>';
         return $out;
 	}
 
@@ -420,10 +424,10 @@ class Alio_Ads_Monitor_Settings extends Alio_Ads_Monitor {
 	 * @since 1.0.0
 	 * @static
 	 * @see Alio_Ads_Monitor()
-	 * @return Main Alio_Ads_Monitor_Settings instance
+	 * @return Alio_Ads_Monitor_Settings instance
 	 */
 	public static function instance ( $parent ) {
-		if ( is_null( self::$_instance ) ) {
+		if (self::$_instance === null) {
 			self::$_instance = new self( $parent );
 		}
 		return self::$_instance;

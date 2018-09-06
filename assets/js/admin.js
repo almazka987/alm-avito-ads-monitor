@@ -22,7 +22,7 @@ jQuery( document ).ready( function ( $ ) {
         });
     });
 
-    $('.last-monitor-table .js-bulk-avito-exclude').on('click', function(event) {
+    $('.last-monitor-option-table .js-bulk-avito-exclude').on('click', function(event) {
         event.preventDefault();
         var excludeIDs = [];
         $('input[name="bulk-exclude-checks"]').each(function(idx, el) {

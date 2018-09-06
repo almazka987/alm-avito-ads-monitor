@@ -72,6 +72,7 @@ class Alio_Ads_Monitor {
     public $avito_keys_option;
     public $avito_keywords_array;
     public $avito_db_data;
+    public $avito_monitor_data;
 
 	/**
 	 * Constructor function.
@@ -94,6 +95,7 @@ class Alio_Ads_Monitor {
         $this->avito_keys_option = get_option('aam_avito_keys');
         $this->avito_email_option = get_option('aam_avito_email');
         $this->avito_keywords_array = $this->get_keys_array($this->avito_keys_option);
+        $this->avito_monitor_data = array();
         $this->upd_avito_db_data();
 
 		register_activation_hook( $this->file, array( $this, 'install' ) );
@@ -209,13 +211,68 @@ class Alio_Ads_Monitor {
     }
 
     /**
-     * Get keys aray from the string option
+     * Get keys array from the string option
      * @param $str
      * @return array
      */
-    function get_keys_array( $str = '' ) {
-        $k_array = explode( ',', $this->clear( $str ), -1 );
+    public function get_keys_array( $str ) {
+        $k_array = ( !empty( $str ) ) ? explode( ',', $this->clear( $str ) ) : array();
         return $k_array;
+    }
+
+    /**
+     * Get count of pages Avito searching
+     * @param $key
+     * @param int $page
+     * @return int
+     */
+    public function lets_parse_avito_page( $key, $page ) {
+        $cnt = 0;
+        $city = ( $this->avito_city_option ) ? $this->avito_city_option : 'omsk';
+        $p_request = ( $page == 0 ) ? '' : 'p=' . $page . '&';
+        $url = 'https://www.avito.ru/' . $city . '?' . $p_request . 'q=' . $key;
+        $key_id = $this->transliterate( $this->clear( $key ) );
+        $file = file_get_contents( $url );
+
+        if ( $doc = phpQuery::newDocumentHTML( $file, 'utf-8' ) ) {
+            if ( $page == 0 ) {
+                $cnt = $doc->find('div.pagination-pages > a.pagination-page' )->count();
+            }
+
+            foreach ( $doc->find('div.item.item_table') as $item_table ) {
+                $item_table = pq($item_table);
+                $avito_item_id = $key_id . $item_table->attr('id');
+                $excludes_from_db = $this->avito_db_data[0]->exclude_items;
+                $exclude_arr = ( !empty( $excludes_from_db ) ) ? json_decode( $excludes_from_db, true ) : array();
+
+                if ( !empty( $exclude_arr ) && in_array( $avito_item_id, $exclude_arr ) ) continue;
+
+                $bad_symbols = array('background-image: url(', ')', ';');
+                $img_from_ul_style = $item_table->find('a.large-picture .item-slider-list .item-slider-item:eq(0) div.item-slider-image')->attr('style');
+                $img_from_ul_srcpath = $item_table->find('a.large-picture .item-slider-list .item-slider-item:eq(0) div.item-slider-image')->attr('data-srcpath');
+                $img_from_a = $item_table->find('a.large-picture img.large-picture')->attr('src');
+                $item_title = $item_table->find('div.item_table-header > h3 > a span')->text();
+                $item_link = $item_table->find('div.item_table-header > h3 > a')->attr('href');
+                if ( $item_link ) {
+                    $item_link = 'https://www.avito.ru/' . $item_link;
+                }
+                $item_price = $item_table->find('div.item_table-header span.price')->html();
+
+                if ( $img_from_ul_style && !$img_from_ul_srcpath ) {
+                    $img_from_ul_style = 'http:' . str_replace( $bad_symbols, '', $img_from_ul_style );
+                    $this->avito_monitor_data[$avito_item_id]['image'] = '<img alt="" src="' . $img_from_ul_style . '">';
+                } elseif ( $img_from_ul_srcpath ) {
+                    $this->avito_monitor_data[$avito_item_id]['image'] = '<img alt="" src="http:' . $img_from_ul_srcpath . '">';
+                } elseif ( $img_from_a ) {
+                    $img_from_a = str_replace( array('//', 'https://', 'http://'), 'http://', $img_from_a );
+                    $this->avito_monitor_data[$avito_item_id]['image'] = '<img alt="" src="' . $img_from_a . '">';
+                }
+                $this->avito_monitor_data[$avito_item_id]['keyword'] = $key;
+                $this->avito_monitor_data[$avito_item_id]['description'] = '<div><h3><a href="' . $item_link . '" target="blank">' . $item_title. '</a></h3>' . $item_price . '</div>';
+            }
+        }
+
+        return $cnt;
     }
 
     /**
@@ -224,65 +281,36 @@ class Alio_Ads_Monitor {
      */
     public function alio_parse_avito() {
         $site = 'avito';
-        $city = ( $this->avito_city_option ) ? $this->avito_city_option : 'omsk';
-        $avito_monitor_data = array();
         $search_date = time();
 
         foreach ( $this->avito_keywords_array as $key ) {
-            $url = 'https://www.avito.ru/' . $city . '?s_trg=3&q=' . $key;
-            $file = file_get_contents( $url );
-            if ( $doc = phpQuery::newDocumentHTML( $file, 'utf-8' ) ) {
-                foreach ($doc->find('div.item.item_table') as $item_table) {
-                    $item_table = pq($item_table);
-                    $avito_item_id = $item_table->attr('id');
+            $pages_count = $this->lets_parse_avito_page( $key, 0 );
 
-                    $excludes_from_db = $this->avito_db_data[0]->exclude_items;
-                    $exclude_arr = ( !empty( $excludes_from_db ) ) ? json_decode( $excludes_from_db, true ) : array();
-                    if ( !empty( $exclude_arr ) && in_array( $avito_item_id, $exclude_arr ) ) continue;
-                    $bad_symbols = array('background-image: url(', ')', ';');
-                    $img_from_ul_style = $item_table->find('a.large-picture .item-slider-list .item-slider-item:eq(0) div.item-slider-image')->attr('style');
-                    $img_from_ul_srcpath = $item_table->find('a.large-picture .item-slider-list .item-slider-item:eq(0) div.item-slider-image')->attr('data-srcpath');
-                    $img_from_a = $item_table->find('a.large-picture > img.large-picture')->attr('data-srcpath');
-
-                    $item_title = $item_table->find('div.item_table-header > h3 > a span')->text();
-                    $item_link = $item_table->find('div.item_table-header > h3 > a')->attr('href');
-                    if ( $item_link ) {
-                        $item_link = 'https://www.avito.ru/' . $item_link;
-                    }
-                    $item_price = $item_table->find('div.item_table-header span.price')->html();
-
-                    if ( $img_from_ul_style && !$img_from_ul_srcpath ) {
-                        $img_from_ul_style = 'http:' . str_replace( $bad_symbols, '', $img_from_ul_style );
-                        $avito_monitor_data[$avito_item_id]['image'] = '<img alt="" src="' . $img_from_ul_style . '">';
-                    } elseif ( $img_from_ul_srcpath ) {
-                            $avito_monitor_data[$avito_item_id]['image'] = '<img alt="" src="http:' . $img_from_ul_srcpath . '">';
-                    } elseif ( $img_from_a ) {
-                            $avito_monitor_data[$avito_item_id]['image'] = '<img alt="" src="http:' . $img_from_a . '">';
-                    }
-                    $avito_monitor_data[$avito_item_id]['keyword'] = $key;
-                    $avito_monitor_data[$avito_item_id]['description'] = '<div><h3><a href="' . $item_link . '" target="blank">' . $item_title. '</a></h3>' . $item_price . '</div>';
+            if ( $pages_count > 0 ) {
+                for ( $i = 2; $i <= $pages_count; $i++ ) {
+                    $this->lets_parse_avito_page( $key, $i );
                 }
             }
         }
-//$avito_monitor_data['lol696894409'] = array('keyword' => 'опал', 'image' => '', 'description' => '');
+
         global $wpdb;
         $wpdb->show_errors( true );
         
-        $new_data = $this->avito_search_new( $avito_monitor_data );
+        $new_data = $this->avito_search_new();
 
         if ( empty( $this->avito_db_data ) ) {
             $wpdb->insert( $wpdb->prefix . 'alio_ads_monitor', array(
                 'ID' => '',
                 'search_date' => date('Y/m/d H:i:s', $search_date ),
                 'site' => $site,
-                'data' => json_encode( $avito_monitor_data, JSON_UNESCAPED_UNICODE ),
+                'data' => json_encode( $this->avito_monitor_data, JSON_UNESCAPED_UNICODE ),
                 'new_data' => json_encode( $new_data, JSON_UNESCAPED_UNICODE ),
             ) );
         } else {
             $wpdb->update( $wpdb->prefix . 'alio_ads_monitor', array(
                 'search_date' => date('Y/m/d H:i:s', $search_date ),
                 'site' => $site,
-                'data' => json_encode( $avito_monitor_data, JSON_UNESCAPED_UNICODE ),
+                'data' => json_encode( $this->avito_monitor_data, JSON_UNESCAPED_UNICODE ),
                 'new_data' => json_encode( $new_data, JSON_UNESCAPED_UNICODE ),
             ), array('id' => $this->avito_db_data[0]->id) );
         }
@@ -303,53 +331,71 @@ error_log(print_R($new_data, true));
     public function avito_send_mail() {
         $new_data = json_decode( $this->avito_db_data[0]->new_data, true );
         $all_data = json_decode( $this->avito_db_data[0]->data, true );
+        $new_keywords = array();
+        if ( is_array( $new_data ) ) {
+            foreach ( $new_data as $new_data_arr ) {
+                $new_keywords[] = $new_data_arr['keyword'];
+            }
+            $new_keywords = array_unique( $new_keywords );
+        }
+
         $other_data = array_diff_key( $all_data, $new_data );
         $msg  = '';
-        $descr_text = ( $this->avito_city_option && $this->avito_keys_option ) ? __( 'Search Ads in ', 'alio-ads-monitor' ) . $this->avito_city_option . __( ' city using keywords: ', 'alio-ads-monitor' ) . $this->avito_keys_option : __( 'City and search keyword was not specified!', 'alio-ads-monitor' );
-        $msg .= '<div style="text-align: right;"><a href="' . get_site_url() . '/wp-admin/options-general.php?page=alio_ads_monitor_settings" target="blank">' . __( 'Go to Settings Page to customize settings or exclude items', 'alio-ads-monitor' ) . '</a></div>
-        <div style="width:100%;min-height:100%;margin:0;padding:0;background-color:#eeeeee;border-radius: 25px;">
-        <h2 style="padding: 20px;border-bottom: 1px dashed;text-align: center;">' . __( 'Avito Monitoring', 'alio-ads-monitor' ) . '</h2>
-        <p style="text-align: center;">' . $descr_text . '</p>
-        <table border="0" cellpadding="0" cellspacing="0" valign="top" style="margin-left:auto;margin-right:auto;width: 100%;"><tbody>';
-        foreach( $this->avito_keywords_array as $k_word ) {
-            $msg .= '<tr><td colspan="2" bgcolor="#6c7ae0" width="100" height="59" style="text-align: center;font-weight: bold;">' . __( 'Keyword: ', 'alio-ads-monitor' ) . $k_word . '</td></tr>';
-            if ( !empty( $new_data ) ) {
-                foreach ($new_data as $new_item_arr) {
-                    if ( $new_item_arr['keyword'] == $k_word ) {
-                        $msg .= '<tr style="background: #c4d3f6;"><td style="padding: 20px;border-bottom: 1px solid #fff;text-align: center;">' . $new_item_arr['image'] . '</td><td style="padding: 20px;border-bottom: 1px solid #fff;">' . $new_item_arr['description'] . '</td></tr>';
+        $descr_text = ( $this->avito_city_option && $this->avito_keys_option ) ? __( 'Founded updates by keywords: ', 'alio-ads-monitor' ) : '';
+        $msg .= '<div style="text-align: right;"><a href="' . get_site_url() . '/wp-admin/options-general.php?page=alio_ads_monitor_settings" target="blank">' . __( 'Go to Settings Page to customize settings or exclude items', 'alio-ads-monitor' ) . '</a></div>';
+        $msg .= '<div class="last-monitor-holder" style="min-height: 100%;margin: 0;padding: 0;background-color: #c4d3f6;border-radius: 25px;max-width: 900px;"><div class="title-block"><h2 style="padding: 20px;border-bottom: 1px dashed;text-align: center;">' . __( 'Avito Monitoring', 'alio-ads-monitor' ) . '</h2>
+        <p style="font-size: 14px;text-align: center;">' . $descr_text . '</p>';
+        if ( !empty( $this->avito_db_data[0]->search_date ) ) {
+            $msg .= '<p style="font-size: 14px;text-align: center;">Last Parsing ' . $this->avito_db_data[0]->search_date . '</p>';
+        }
+        $msg .= '</div><div class="last-monitor-wrapper">';
+
+        if ( !empty( $new_keywords ) ) {
+            foreach( $new_keywords as $k_word ) {
+                $msg .= '<div class="table-header" style="overflow: hidden;padding: 20px;font-weight: bold;background: #6c7ae0;font-size: 14px;color: #000;text-align: center;"><h4 style="margin: 0;">' . __( 'Keyword: ', 'alio-ads-monitor' ) . $k_word . '</h4></div>';
+
+                $msg .= '<div class="table-scrolling-container" style="max-height: 500px;overflow-y: scroll;"><div class="last-monitor-table" style="display: table;width: 100%;">';
+
+                foreach ($new_data as $item) {
+                    if ( $item['keyword'] == $k_word ) {
+                        $msg .= '<div class="row" style="display: table-row;background: #fbc3d5;"><div class="cell image" style="text-align: center;display: table-cell;vertical-align: middle;width: 200px;padding: 20px;border-bottom: 1px solid #fff;">' . $item['image'] . '</div><div class="cell" style="display: table-cell;vertical-align: middle;width: 200px;padding: 20px;border-bottom: 1px solid #fff;">' . $item['description'] . '</div></div>';
                     }
                 }
-            }
-            foreach ($other_data as $item) {
-                if ( $item['keyword'] == $k_word ) {
-                    $msg .= '<tr><td style="padding: 20px;border-bottom: 1px solid #fff;text-align: center;">' . $item['image'] . '</td><td style="padding: 20px;border-bottom: 1px solid #fff;">' . $item['description'] . '</td></tr>';
+                foreach ($other_data as $oth_item) {
+                    if ( $oth_item['keyword'] == $k_word ) {
+                        $msg .= '<div class="row" style="display: table-row;"><div class="cell image" style="text-align: center;display: table-cell;vertical-align: middle;width: 200px;padding: 20px;border-bottom: 1px solid #fff;">' . $oth_item['image'] . '</div><div class="cell" style="display: table-cell;vertical-align: middle;width: 200px;padding: 20px;border-bottom: 1px solid #fff;">' . $oth_item['description'] . '</div></div>';
+                    }
                 }
+
+                $msg .= '</div><!-- End Table--></div>';
+
             }
         }
-        $msg .= '</tbody></table></div>';
+        $msg .= '<div class="last-monitor-option-table" style="border-top: 1px dashed #fff;display: table;width: 100%;"><div style="display: table-row;"><div style="display: table-cell;vertical-align: middle;width: 200px;padding: 20px;"></div><div style="display: table-cell;vertical-align: middle;width: 200px;padding: 20px;"></div><div style="display: table-cell;vertical-align: middle;width: 200px;padding: 20px;"></div></div></div>';
+        $msg .= '</div><!-- End last-monitor-wrapper --></div>';
+
         $subject = "Avito Parsing Info";
         $headers = "Content-Type: text/html \r\n From: Alio Ads Monitor <noanswer@". $_SERVER['HTTP_HOST'] .">" . "\r\n";
-        //$result = wp_mail( $this->avito_email_option, $subject, $msg, $headers );
-//error_log(print_R('email send?', true));
-//error_log(print_R($result, true));
+        $result = wp_mail( $this->avito_email_option, $subject, $msg, $headers );
+error_log(print_R('email send?', true));
+error_log(print_R($result, true));
     }
 
     /**
      * Check Avito saved data and enable to replace or not
      * @param $query
-     * @param $data_from_monitor
      * @return array
      */
-    public function avito_search_new( $data_from_monitor ) {
+    public function avito_search_new() {
         $res_arr = array();
         if ( !empty( $this->avito_db_data ) ) {
             $data_from_db = json_decode( $this->avito_db_data[0]->data, true );
-            $diff_arr = array_diff_key( $data_from_monitor, $data_from_db );
+            $diff_arr = array_diff_key( $this->avito_monitor_data, $data_from_db );
             if ( !empty( $diff_arr ) ) {
                 $res_arr = $diff_arr;
             }
         } else {
-            $res_arr = $data_from_monitor;
+            $res_arr = $this->avito_monitor_data;
         }
         return $res_arr;
     }
@@ -361,13 +407,8 @@ error_log(print_R($new_data, true));
     public function load_searching () {
 error_log(print_R('from load searching foo', true));
 // код который потом будет в кроновской функции - тут пишу чтоб сразу запускался - удали комм когда все перенесешь
-        if ( $this->avito_enable_option ) {
-            $this->alio_parse_avito();
-        }
-
-
-
-        // кроновский код конец
+        // тут будет дарударовская функция пока не будет completed
+// кроновский код конец
 
         add_filter( 'cron_schedules', array( $this, 'alio_interval' ) );
         add_action( 'cron_daily', array( $this, 'alio_cron_daily' ) );
@@ -389,10 +430,6 @@ error_log(print_R('from alio interval ' . time(), true));
             'interval' => 7200,
             'display' => 'Every 2 hours'
         );
-        $schedule['every_05'] = array(
-            'interval' => 300,
-            'display' => 'Every 05 minutes'
-        );
         return $schedule;
     }
 
@@ -402,15 +439,19 @@ error_log(print_R('from alio interval ' . time(), true));
      */
     public function alio_cron_daily() {
 error_log(print_R('from alio_cron_daily', true));
-        // сюда все переносим
-        $this->cron_testing();
+        if ( $this->avito_enable_option ) {
+            $this->alio_parse_avito();
+        }
+        // сюда перенесем дд и ом, когда будут готовы и протестированы
+
+        // $this->cron_testing();
     }
 
     public function cron_testing() {
 error_log(print_R('from testing cron', true));
         $msg  = 'cron test';
         $my_post = array(
-            'post_title' => '>>>> Report on the work of Cron ' . date('Y-m-d H:i:s'),
+            'post_title' => '>>> Report on the work of Cron ' . date('Y-m-d H:i:s'),
             'post_content' => $msg,
             'post_status' => 'publish',
             'post_author' => 1,
@@ -419,18 +460,20 @@ error_log(print_R('from testing cron', true));
         wp_insert_post( $my_post );
     }
 
-	/**
-	 * Main Alio_Ads_Monitor Instance
-	 *
-	 * Ensures only one instance of Alio_Ads_Monitor is loaded or can be loaded.
-	 *
-	 * @since 1.0.0
-	 * @static
-	 * @see Alio_Ads_Monitor()
-	 * @return Main Alio_Ads_Monitor instance
-	 */
+    /**
+     * Main Alio_Ads_Monitor Instance
+     *
+     * Ensures only one instance of Alio_Ads_Monitor is loaded or can be loaded.
+     *
+     * @since 1.0.0
+     * @static
+     * @see Alio_Ads_Monitor()
+     * @param string $file
+     * @param string $version
+     * @return Alio_Ads_Monitor instance
+     */
 	public static function instance ( $file = '', $version = '1.0.0' ) {
-		if ( is_null( self::$_instance ) ) {
+		if (self::$_instance === null) {
 			self::$_instance = new self( $file, $version );
 		}
 		return self::$_instance;

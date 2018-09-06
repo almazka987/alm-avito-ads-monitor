@@ -78,5 +78,8 @@ msgstr "Исключить из отслеживания"
 msgid "Last Avito Monitor Results"
 msgstr "Последние результаты мониторинга Авито"
 
-msgid "Last Parsing "
+msgid "Last Parsing"
 msgstr "Дата сканирования"
+
+msgid "Founded updates by keywords: "
+msgstr "Обнаружены обновления по ключевым словам: "
