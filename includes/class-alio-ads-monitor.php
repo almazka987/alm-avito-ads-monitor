@@ -276,6 +276,22 @@ class Alio_Ads_Monitor {
     }
 
     /**
+     * Get Array from new Avito items
+     * @return array
+     */
+    public function get_new_keys_arr() {
+        $new_keys = array();
+        $new_data = json_decode( $this->avito_db_data[0]->new_data, true );
+        if ( is_array( $new_data ) ) {
+            foreach ( $new_data as $new_data_arr ) {
+                $new_keys[] = $new_data_arr['keyword'];
+            }
+            $new_keys = array_unique( $new_keys );
+        }
+        return $new_keys;
+    }
+
+    /**
      * Parse and save Avito data in DB
      * @return void
      */
@@ -319,7 +335,8 @@ class Alio_Ads_Monitor {
         if ( $this->avito_email_option && !empty( $new_data ) ) {
 error_log(print_R('not empty new data:', true));
 error_log(print_R($new_data, true));
-            add_action( 'plugins_loaded', array( $this, 'avito_send_mail' ) );
+            $this->avito_send_mail();
+            //add_action( 'plugins_loaded', array( $this, 'avito_send_mail' ) );
         }
 
     }
@@ -331,15 +348,9 @@ error_log(print_R($new_data, true));
     public function avito_send_mail() {
         $new_data = json_decode( $this->avito_db_data[0]->new_data, true );
         $all_data = json_decode( $this->avito_db_data[0]->data, true );
-        $new_keywords = array();
-        if ( is_array( $new_data ) ) {
-            foreach ( $new_data as $new_data_arr ) {
-                $new_keywords[] = $new_data_arr['keyword'];
-            }
-            $new_keywords = array_unique( $new_keywords );
-        }
-
+        $new_keywords = $this->get_new_keys_arr();
         $other_data = array_diff_key( $all_data, $new_data );
+
         $msg  = '';
         $descr_text = ( $this->avito_city_option && $this->avito_keys_option ) ? __( 'Founded updates by keywords: ', 'alio-ads-monitor' ) : '';
         $msg .= '<div style="text-align: right;"><a href="' . get_site_url() . '/wp-admin/options-general.php?page=alio_ads_monitor_settings" target="blank">' . __( 'Go to Settings Page to customize settings or exclude items', 'alio-ads-monitor' ) . '</a></div>';
@@ -444,7 +455,7 @@ error_log(print_R('from alio_cron_daily', true));
         }
         // сюда перенесем дд и ом, когда будут готовы и протестированы
 
-        // $this->cron_testing();
+        $this->cron_testing();
     }
 
     public function cron_testing() {

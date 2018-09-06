@@ -90,6 +90,10 @@ a.open-container {
     border-bottom: none;
 }
 
+.last-monitor-table .row.new {
+    background: #fbc3d5;
+}
+
 .last-monitor-table .monitor-item.image {
     text-align: center;
 }

@@ -386,8 +386,11 @@ class Alio_Ads_Monitor_Settings extends Alio_Ads_Monitor {
      */
     public function avito_last_monitor_results() {
         $out = '';
+        $new_data = json_decode( $this->parent->avito_db_data[0]->new_data, true );
         $all_data = json_decode( $this->parent->avito_db_data[0]->data, true );
         $keywords = $this->parent->avito_keywords_array;
+        $other_data = array_diff_key( $all_data, $new_data );
+
         $descr_text = ( $this->parent->avito_city_option && $this->parent->avito_keys_option ) ? __( 'Search Ads in ', 'alio-ads-monitor' ) . $this->parent->avito_city_option . __( ' city using keywords: ', 'alio-ads-monitor' ) . $this->parent->avito_keys_option : __( 'City and search keyword was not specified!', 'alio-ads-monitor' );
 
         $out .= '<div class="last-monitor-holder"><div class="title-block"><h2>' . __( 'Last Avito Monitor Results', 'alio-ads-monitor' ) . '</h2>
@@ -401,8 +404,15 @@ class Alio_Ads_Monitor_Settings extends Alio_Ads_Monitor {
             foreach( $keywords as $k_word ) {
                 $out .= '<div class="table-header"><h4 class="keyword-heading">' . __( 'Keyword: ', 'alio-ads-monitor' ) . $k_word . '</h4></div>';
                 $out .= '<div class="table-scrolling-container"><div class="last-monitor-table" data-keyword="' . $k_word . '">';
-                if ( !empty( $all_data ) ) {
-                    foreach ($all_data as $item_id => $item) {
+                if ( !empty( $new_data ) ) {
+                    foreach ($new_data as $item_id => $item) {
+                        if ( $item['keyword'] == $k_word ) {
+                            $out .= '<div class="row new item-block item' . $item_id . '"><div class="cell monitor-item image">' . $item['image'] . '</div><div class="cell monitor-item">' . $item['description'] . '</div><div class="cell monitor-item"><a href="" class="exclude-item js-avito-exclude" data-exclude-id="' . $item_id . '">Exclude item from monitoring</a><div class="bulk-checkbox-holder"><h3>or</h3><label class="checkcontainer"><span class="bulk-checkbox-title">bulk exclude</span><input type="checkbox" name="bulk-exclude-checks" data-exclude-id="' . $item_id . '"></label></div></div></div>';
+                        }
+                    }
+                }
+                if ( !empty( $other_data ) ) {
+                    foreach ($other_data as $item_id => $item) {
                         if ( $item['keyword'] == $k_word ) {
                             $out .= '<div class="row item-block item' . $item_id . '"><div class="cell monitor-item image">' . $item['image'] . '</div><div class="cell monitor-item">' . $item['description'] . '</div><div class="cell monitor-item"><a href="" class="exclude-item js-avito-exclude" data-exclude-id="' . $item_id . '">Exclude item from monitoring</a><div class="bulk-checkbox-holder"><h3>or</h3><label class="checkcontainer"><span class="bulk-checkbox-title">bulk exclude</span><input type="checkbox" name="bulk-exclude-checks" data-exclude-id="' . $item_id . '"></label></div></div></div>';
                         }
