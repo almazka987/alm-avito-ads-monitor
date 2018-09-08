@@ -90,21 +90,23 @@ class Alio_Ads_Monitor {
         $this->dir = dirname( $this->file );
         $this->assets_dir = trailingslashit( $this->dir ) . 'assets';
         $this->assets_url = esc_url( trailingslashit( plugins_url( '/assets/', $this->file ) ) );
-        $this->avito_enable_option = get_option('aam_avito_enable');
-        $this->avito_city_option = $this->transliterate( $this->clear( get_option('aam_avito_city') ) );
-        $this->avito_keys_option = get_option('aam_avito_keys');
-        $this->avito_email_option = get_option('aam_avito_email');
-        $this->avito_keywords_array = $this->get_keys_array($this->avito_keys_option);
+
+        $this->upd_avito_options();
         $this->avito_monitor_data = array();
+
+        // Create DB table
+        $this->db_install();
         $this->upd_avito_db_data();
 
-		register_activation_hook( $this->file, array( $this, 'install' ) );
+        register_activation_hook( $this->file, array( $this, 'install' ) );
         register_activation_hook( $this->file, array( $this, 'alio_cron_activation' ) );
         register_deactivation_hook( $this->file, array( $this, 'alio_cron_deactivation' ) );
 
         // Load admin JS & CSS
         add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ), 10, 1 );
         add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_styles' ), 10, 1 );
+
+        add_action('updated_option', array( $this, 'new_start_after_save_options' ), 10, 2);
 
 		// Load API for generic admin functions
 		if ( is_admin() ) {
@@ -114,12 +116,30 @@ class Alio_Ads_Monitor {
 		// Handle localisation
 		$this->load_localisation();
 
-		// Create DB table
-		$this->db_install();
-
 		// Start searching
         $this->load_searching();
-	} // End __construct ()
+
+	} // End __construct()
+
+    /**
+     * Update all avito options
+     * @return void
+     */
+    public function upd_avito_options() {
+        $this->avito_enable_option = get_option('aam_avito_enable');
+        $this->avito_city_option = $this->transliterate( $this->clear( get_option('aam_avito_city') ) );
+        $this->avito_keys_option = get_option('aam_avito_keys');
+        $this->avito_email_option = get_option('aam_avito_email');
+        $this->avito_keywords_array = $this->get_keys_array($this->avito_keys_option);
+    }
+
+    public function new_start_after_save_options( $option_name ) {
+    if ( $option_name == 'aam_avito_city' || $option_name == 'aam_avito_email' || $option_name == 'aam_avito_keys' )
+        if ( $this->avito_enable_option ) {
+            $this->upd_avito_options();
+            $this->alio_parse_avito();
+        }
+    }
 
     /**
      * Load admin CSS.
@@ -242,8 +262,7 @@ class Alio_Ads_Monitor {
             foreach ( $doc->find('div.item.item_table') as $item_table ) {
                 $item_table = pq($item_table);
                 $avito_item_id = $key_id . $item_table->attr('id');
-                $excludes_from_db = $this->avito_db_data[0]->exclude_items;
-                $exclude_arr = ( !empty( $excludes_from_db ) ) ? json_decode( $excludes_from_db, true ) : array();
+                $exclude_arr = ( !empty( $this->avito_db_data[0]->exclude_items ) ) ? json_decode( $this->avito_db_data[0]->exclude_items , true ) : array();
 
                 if ( !empty( $exclude_arr ) && in_array( $avito_item_id, $exclude_arr ) ) continue;
 
@@ -298,7 +317,6 @@ class Alio_Ads_Monitor {
     public function alio_parse_avito() {
         $site = 'avito';
         $search_date = time();
-
         foreach ( $this->avito_keywords_array as $key ) {
             $pages_count = $this->lets_parse_avito_page( $key, 0 );
 
@@ -333,10 +351,7 @@ class Alio_Ads_Monitor {
         $this->upd_avito_db_data();
 
         if ( $this->avito_email_option && !empty( $new_data ) ) {
-error_log(print_R('not empty new data:', true));
-error_log(print_R($new_data, true));
-            $this->avito_send_mail();
-            //add_action( 'plugins_loaded', array( $this, 'avito_send_mail' ) );
+            $this->avito_send_mail(); //for testing not cron use add_action( 'plugins_loaded', array( $this, 'avito_send_mail' ) );
         }
 
     }
@@ -387,9 +402,7 @@ error_log(print_R($new_data, true));
 
         $subject = "Avito Parsing Info";
         $headers = "Content-Type: text/html \r\n From: Alio Ads Monitor <noanswer@". $_SERVER['HTTP_HOST'] .">" . "\r\n";
-        $result = wp_mail( $this->avito_email_option, $subject, $msg, $headers );
-error_log(print_R('email send?', true));
-error_log(print_R($result, true));
+        wp_mail( $this->avito_email_option, $subject, $msg, $headers );
     }
 
     /**
@@ -416,7 +429,6 @@ error_log(print_R($result, true));
      * @return void
      */
     public function load_searching () {
-error_log(print_R('from load searching foo', true));
 // код который потом будет в кроновской функции - тут пишу чтоб сразу запускался - удали комм когда все перенесешь
         // тут будет дарударовская функция пока не будет completed
 // кроновский код конец
@@ -426,17 +438,14 @@ error_log(print_R('from load searching foo', true));
     }
 
     public function alio_cron_activation () {
-error_log(print_R('in cron activation ' . time(), true));
         wp_schedule_event( time(), 'every_2', 'cron_daily' );
     }
 
     public function alio_cron_deactivation () {
-error_log(print_R('from cron deactivation ' . time(), true));
         wp_clear_scheduled_hook( 'cron_daily' );
     }
 
     public function alio_interval ( $schedule ) {
-error_log(print_R('from alio interval ' . time(), true));
         $schedule['every_2'] = array(
             'interval' => 7200,
             'display' => 'Every 2 hours'
@@ -449,17 +458,15 @@ error_log(print_R('from alio interval ' . time(), true));
      * @return void
      */
     public function alio_cron_daily() {
-error_log(print_R('from alio_cron_daily', true));
         if ( $this->avito_enable_option ) {
             $this->alio_parse_avito();
         }
         // сюда перенесем дд и ом, когда будут готовы и протестированы
 
-        $this->cron_testing();
+        //$this->cron_testing();
     }
 
     public function cron_testing() {
-error_log(print_R('from testing cron', true));
         $msg  = 'cron test';
         $my_post = array(
             'post_title' => '>>> Report on the work of Cron ' . date('Y-m-d H:i:s'),
