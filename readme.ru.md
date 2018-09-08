@@ -1,8 +1,8 @@
 # Alio Ads Monitor
 
-:page_facing_up: [Читать это на русском языке](https://github.com/aliowebdeveloper/alio-ads-monitor/readme.ru.md)
+:page_facing_up: [Read this in ENGLISH](https://github.com/aliowebdeveloper/alio-ads-monitor/readme.md)
 
-Alio Ads Monitor is a plugin for automatically searching ads on Avito site, gifts on the DaruDar website and monitor of the Omskmama forum ads desk.
+Alio Ads Monitor это WordPress плагин для автоматического поиска и мониторинга объявлений на сайте объявлений Авито прямо с вашего локального сервера (например Open Server - OSPanel) for automatically searching ads on Avito site, gifts on the DaruDar website and monitor of the Omskmama forum ads desk.
 
 ## Description
 
