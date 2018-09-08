@@ -1,42 +1,58 @@
-# Alio Ads Monitor
+# Alio Avito Ads Monitor
 
-:page_facing_up: [Read this in ENGLISH](https://github.com/aliowebdeveloper/alio-ads-monitor/readme.md)
+:triangular_flag_on_post: Внимание! Плагин находится в стадии разработки. Стабильная работа не гарантирована.
 
-Alio Ads Monitor это WordPress плагин для автоматического поиска и мониторинга объявлений на сайте объявлений Авито прямо с вашего локального сервера (например Open Server - OSPanel) for automatically searching ads on Avito site, gifts on the DaruDar website and monitor of the Omskmama forum ads desk.
+:page_facing_up: [Read this in ENGLISH](https://github.com/aliowebdeveloper/alio-avito-ads-monitor/readme.md)
 
-## Description
+Alio Avito Ads Monitor это WordPress плагин для автоматического поиска и мониторинга объявлений на сайте объявлений Авито прямо с вашего локального сервера (например, Open Server - OSPanel).
 
-Everyone in life may need to find any goods on the cheap or for nothing in websites. There are many things on websites such as Avito, DaruDar as well as on the forum Omskmama - its a Omsk city forum where there's a Bulletin Board. Similar sites in the Internet you can find quite a lot. These three sites were chosen solely because the developer of the plugin using it.
+## Описание
 
-This plugin for those who do not want to spend extra time to go to the site Avito, DaruDar or Omskmama forum to enter into the search for the keywords and seek the necessary goods.
+Иногда в жизни может понадобиться купить какой-либо товар по недорогой выгодной цене, либо продать какие-то свои вещи. Отлично для этого подходит известный российский сайт объявлений avito.ru. 
 
-This plugin will do the search for you in the background and if successful, the program will be send you a notification about this by e-mail.
+Данный плагин используется для автоматического поиска на сайте авито и мониторинга товаров по ключевым словам, без необходимости заходить на сам сайт объявлений. Результаты поиска отображаются в админке WordPress, а также возможно включение email-уведомлений при обнаружении обновлений на Авито по нужным ключевым словам.
 
-![Avito ads automatic search results in email notification](https://frantic-coding.000webhostapp.com/wp-content/uploads/2018/09/screenshot2.jpg)
+## Как это работает
 
-There is also the opportunity to observe the statistics of automatically queries, exclude wrong items from next parsing. So on the plugin settings page you can see the results of automatic queries.
+- Плагин работает на базе любого WordPress сайта на любом сервере (локальном или удаленном - без разницы).
+
+- Плагин создает в админке WordPress раздел с настройками плагина "Alio Avito Ads Monitor", где пользователь заполняет необходимые поля - ключевые слова через запятую, город, по которому будет производиться поиск, e-mail адрес для уведомлений о добавлении новых объявлений по ключевым словам.
+
+- Результаты поиска и мониторинга отображаются в этом же разделе. Есть возможность исключить неподходящие пункты из отслеживания.
 
 ![Avito Monitor Results on the Settings Page](https://frantic-coding.000webhostapp.com/wp-content/uploads/2018/09/screenshot1.jpg)
 
-## Usage
+- Примерно каждые 2 часа происходит проверка наличия новых объявлений по установленным ключевым словам в установленном городе. При наличии обновлений на указанный email отправляется письмо с краткой информацией о новых товарах - изображение, название, стоимость и ссылка для перехода на страницу объявления на Avito. Ничего лишнего.
 
-Just fill out the necessary fields on the plugin page settings - keywords and city for the search, e-mail for notification - and activate checkbox "Enable Ads Monitoring".
+![Avito ads automatic search results in email notification](https://frantic-coding.000webhostapp.com/wp-content/uploads/2018/09/screenshot2.jpg)
 
-## Installation
+## Установка
 
-Follow the steps below:
+Ничем не отличается от типичной установки плагинов для сайта на CMS WordPress.
 
-:one: Download the plugin via github.com
+#### Вариант 1:
 
-:two: Upload the ZIP file through the `Plugins` → `Add New` → `Upload` screen in your WordPress dashboard
+:one: Скачать плагин с github.com, нажав "Download ZIP".
 
-:three: Activate the plugin through the `Plugins` menu in WordPress
+:two: Зайти в админку WordPress, перейти в раздел `Плагины`. Нажать `Добавить новый` → `Загрузить плагин` → `Выбрать файл` и указать путь к скачанному zip-архиву.
 
-## Frequently Asked Questions
+:three: Активировать плагин "Alio Avito Ads Monitor" в разделе `Плагины`.
 
-#### I've got an idea/fix for the plugin
+#### Вариант 2:
 
-"Alio Ads Monitor" is open source software. If you would like to contribute to this plugin then please fork it and send a pull request. I'll merge the request if it fits into the goals for the plugin and credit you in the [changelog](https://github.com/aliowebdeveloper/alio-ads-monitor/blob/master/changelog.txt).
+:one: Клонировать плагин с github.com в папку wp-content/plugins вашего проекта (скрытую папку ".git" можно удалить)
+
+:two: Зайти в админку WordPress, перейти в раздел `Плагины`. Активировать плагин "Alio Avito Ads Monitor".
+
+## Использование
+
+Просто заполняете нужные поля на странице настроек плагина в разделе WordPress админки - `Настройки` → `Avito Ads Monitor`. Не забудьте поставить галочку "Вкл мониторинг сайта Avito" ("Enable Avito Ads Monitoring").
+
+## FAQ
+
+#### Я заметил баг / у меня есть идеи по улучшению плагина
+
+"Alio Avito Ads Monitor" это опенсорсный плагин. Вы можете приложить свою руку к разработке и улучшению плагина. Просто сделайте форк и отправьте pull request своих предложенных изменений. После проверки изменения будут внесены, и описаны в [changelog](https://github.com/aliowebdeveloper/alio-avito-ads-monitor/blob/master/changelog.txt).
 
 ## Changelog
 

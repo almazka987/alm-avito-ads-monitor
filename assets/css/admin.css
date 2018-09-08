@@ -1,4 +1,11 @@
-#alio_ads_monitor_settings .form-wrap p, #alio_ads_monitor_settings p.description, #alio_ads_monitor_settings p.help, #alio_ads_monitor_settings span.description {
+.dashicons-before.options-icon:before {
+    width: 30px;
+    height: 30px;
+    font-size: 30px;
+    margin-right: 5px;
+}
+
+#alio_avito_ads_monitor_settings .form-wrap p, #alio_avito_ads_monitor_settings p.description, #alio_avito_ads_monitor_settings p.help, #alio_avito_ads_monitor_settings span.description {
     display: block;
 }
 

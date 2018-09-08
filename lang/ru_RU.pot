@@ -1,0 +1,88 @@
+# Copyright (C) 2014 Alio Avito Ads Monitor
+# This file is distributed under the same license as the Alio Avito Ads Monitor package.
+msgid ""
+msgstr ""
+"Project-Id-Version: Alio Avito Ads Monitor 1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/aliowebdeveloper/alio-avito-ads-monitor/issues\n"
+"POT-Creation-Date: 2014-04-07 11:28:06+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2014-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+
+msgid "Settings"
+msgstr "Настройки"
+
+msgid "Avito Ads Monitor Settings"
+msgstr "Настройки мониторинга объявлений сайта Авито"
+
+msgid "Enable Avito Ads Monitoring"
+msgstr "Вкл мониторинг сайта Avito"
+
+msgid "Parsing Settings"
+msgstr "Настройки для поиска объявлений"
+
+msgid "Search in City"
+msgstr "Поиск по городу"
+
+msgid "Keywords comma separated"
+msgstr "Ключевые слова через запятую"
+
+msgid 'Example: "Dog, cat, bird"'
+msgstr 'Например: "Собака, кошка, птичка"'
+
+msgid "Please enter your email address to receive notification in case of success finding new ads according to your request"
+msgstr "Укажите свой электронный адрес для отправления уведомлений в случае обнаружения новых объявлений по вашему запросу"
+
+msgid "DaruDar Website Monitoring"
+msgstr "Мониторинг сайта DaruDar"
+
+msgid "Omskmama Website Monitoring"
+msgstr "Мониторинг сайта Омскмама"
+
+msgid "Select search categories"
+msgstr "Разделы для поиска"
+
+msgid "Avito Monitoring"
+msgstr "Мониторинг Авито"
+
+msgid "Avito site monitoring is not activated!"
+msgstr "Мониторинг сайта Авито не включен!"
+
+msgid "Search Ads in "
+msgstr "Поиск объявлений в г. "
+
+msgid " city using keywords: "
+msgstr " по ключевым словам: "
+
+msgid "City and/or search keyword is not specified!"
+msgstr "Город и/или ключевые слова поиска не заданы!"
+
+msgid "Go to Settings Page"
+msgstr "Перейти на страницу настроек"
+
+msgid "Search results for "
+msgstr "Результаты "
+
+msgid "The last monitoring was held "
+msgstr "Последняя проверка проводилась "
+
+msgid "New Ads by Keyword: "
+msgstr "Новые объявления по ключевому слову: "
+
+msgid "Go to Settings Page to customize settings or exclude items"
+msgstr "Перейти на страницу для настройки или исключения пунтов"
+
+msgid "Exclude item from monitoring"
+msgstr "Исключить из отслеживания"
+
+msgid "Last Avito Monitor Results"
+msgstr "Последние результаты мониторинга Авито"
+
+msgid "Last Parsing"
+msgstr "Дата сканирования"
+
+msgid "Founded updates by keywords: "
+msgstr "Обнаружены обновления по ключевым словам: "
