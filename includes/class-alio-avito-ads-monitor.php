@@ -90,7 +90,7 @@ class Alio_Avito_Ads_Monitor {
      * @param string $version
      */
 	public function __construct ( $file = '', $version = '1.0.0' ) {
-        date_default_timezone_set('Asia/Omsk');
+        date_default_timezone_set('Europe/Moscow');
         $this->_version = $version;
         $this->_token = 'alio_avito_ads_monitor';
 
