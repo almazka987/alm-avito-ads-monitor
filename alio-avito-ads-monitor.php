@@ -17,15 +17,17 @@
  * @since 1.0.0
  */
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 
 // Load plugin class files
-require_once( 'includes/class-alio-avito-ads-monitor.php' );
-require_once( 'includes/class-alio-avito-ads-monitor-settings.php' );
+require_once 'includes/class-alio-avito-ads-monitor.php';
+require_once 'includes/class-alio-avito-ads-monitor-settings.php';
 
 // Load plugin libraries
-require_once( 'includes/lib/class-alio-avito-ads-monitor-admin-api.php' );
-require_once( 'includes/lib/phpQuery-onefile.php' );
+require_once 'includes/lib/class-alio-avito-ads-monitor-admin-api.php';
+require_once 'includes/lib/phpQuery-onefile.php';
 
 /**
  * Returns the main instance of Alio_Avito_Ads_Monitor to prevent the need to use globals.
@@ -36,7 +38,7 @@ require_once( 'includes/lib/phpQuery-onefile.php' );
 function Alio_Avito_Ads_Monitor () {
     $instance = Alio_Avito_Ads_Monitor::instance( __FILE__, '1.0.0' );
 
-    if ( is_null( $instance->settings ) ) {
+    if ($instance->settings === null) {
         $instance->settings = Alio_Avito_Ads_Monitor_Settings::instance( $instance );
     }
 

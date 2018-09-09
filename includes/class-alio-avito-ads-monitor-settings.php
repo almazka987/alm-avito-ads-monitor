@@ -2,7 +2,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class Alio_Avito_Ads_Monitor_Settings extends Alio_Avito_Ads_Monitor {
+class Alio_Avito_Ads_Monitor_Settings {
 
 	/**
 	 * The single instance of Alio_Avito_Ads_Monitor_Settings.
@@ -165,6 +165,11 @@ class Alio_Avito_Ads_Monitor_Settings extends Alio_Avito_Ads_Monitor {
 		}
 	}
 
+    public function settings_section ( $section ) {
+        $html = '<p> ' . $this->settings[ $section['id'] ]['description'] . '</p>';
+        echo $html;
+    }
+
 	/**
 	 * Load settings page content
 	 * @return void
@@ -184,7 +189,7 @@ class Alio_Avito_Ads_Monitor_Settings extends Alio_Avito_Ads_Monitor {
 				$html .= ob_get_clean();
 
 				$html .= '<p class="submit">' . "\n";
-					$html .= '<input type="hidden" name="tab" value="' . esc_attr( $tab ) . '" />' . "\n";
+					$html .= '<input type="hidden" name="tab" value="" />' . "\n";
 					$html .= '<input name="Submit" type="submit" class="button-primary" value="' . esc_attr( __( 'Save Settings' , 'alio-avito-ads-monitor' ) ) . '" />' . "\n";
 				$html .= '</p>' . "\n";
 			$html .= '</form>' . "\n";
@@ -264,8 +269,10 @@ class Alio_Avito_Ads_Monitor_Settings extends Alio_Avito_Ads_Monitor {
                     }
                     if (!empty($other_data)) {
                         foreach ($other_data as $item_id => $item) {
+                            $img = !empty( $item['image'] ) ? $item['image'] : '';
+                            $dscr = !empty( $item['description'] ) ? $item['description'] : '';
                             if ($item['keyword'] == $k_word) {
-                                $out .= '<div class="row item-block item' . $item_id . '"><div class="cell monitor-item image">' . $item['image'] . '</div><div class="cell monitor-item">' . $item['description'] . '</div><div class="cell monitor-item"><a href="" class="exclude-item js-avito-exclude" data-exclude-id="' . $item_id . '">Exclude item from monitoring</a><div class="bulk-checkbox-holder"><h3>or</h3><label class="checkcontainer"><span class="bulk-checkbox-title">bulk exclude</span><input type="checkbox" name="bulk-exclude-checks" data-exclude-id="' . $item_id . '"></label></div></div></div>';
+                                $out .= '<div class="row item-block item' . $item_id . '"><div class="cell monitor-item image">' . $img . '</div><div class="cell monitor-item">' . $dscr . '</div><div class="cell monitor-item"><a href="" class="exclude-item js-avito-exclude" data-exclude-id="' . $item_id . '">Exclude item from monitoring</a><div class="bulk-checkbox-holder"><h3>or</h3><label class="checkcontainer"><span class="bulk-checkbox-title">bulk exclude</span><input type="checkbox" name="bulk-exclude-checks" data-exclude-id="' . $item_id . '"></label></div></div></div>';
                             }
                         }
                     }
@@ -278,16 +285,17 @@ class Alio_Avito_Ads_Monitor_Settings extends Alio_Avito_Ads_Monitor {
         return $out;
 	}
 
-	/**
-	 * Main Alio_Avito_Ads_Monitor_Settings Instance
-	 *
-	 * Ensures only one instance of Alio_Avito_Ads_Monitor_Settings is loaded or can be loaded.
-	 *
-	 * @since 1.0.0
-	 * @static
-	 * @see Alio_Avito_Ads_Monitor()
-	 * @return Alio_Avito_Ads_Monitor_Settings instance
-	 */
+    /**
+     * Main Alio_Avito_Ads_Monitor_Settings Instance
+     *
+     * Ensures only one instance of Alio_Avito_Ads_Monitor_Settings is loaded or can be loaded.
+     *
+     * @since 1.0.0
+     * @static
+     * @see Alio_Avito_Ads_Monitor()
+     * @param $parent
+     * @return Alio_Avito_Ads_Monitor_Settings instance
+     */
 	public static function instance ( $parent ) {
 		if (self::$_instance === null) {
 			self::$_instance = new self( $parent );

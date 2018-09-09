@@ -2,7 +2,7 @@
 
 :triangular_flag_on_post: Внимание! Плагин находится в стадии разработки. Стабильная работа не гарантирована.
 
-:page_facing_up: [Read this in ENGLISH](https://github.com/aliowebdeveloper/alio-avito-ads-monitor/readme.md)
+:page_facing_up: [Read this in ENGLISH](https://github.com/aliowebdeveloper/alio-avito-ads-monitor/blob/master/readme.md)
 
 Alio Avito Ads Monitor это WordPress плагин для автоматического поиска и мониторинга объявлений на сайте объявлений Авито прямо с вашего локального сервера (например, Open Server - OSPanel).
 

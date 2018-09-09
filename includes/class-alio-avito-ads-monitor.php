@@ -12,6 +12,14 @@ class Alio_Avito_Ads_Monitor {
 	 */
 	private static $_instance = null;
 
+    /**
+     * Settings class object
+     * @var     object
+     * @access  public
+     * @since   1.0.0
+     */
+    public $settings = null;
+
 	/**
 	 * The version number.
 	 * @var     string
@@ -74,12 +82,13 @@ class Alio_Avito_Ads_Monitor {
     public $avito_db_data;
     public $avito_monitor_data;
 
-	/**
-	 * Constructor function.
-	 * @access  public
-	 * @since   1.0.0
-	 * @return  void
-	 */
+    /**
+     * Constructor function.
+     * @access  public
+     * @since   1.0.0
+     * @param string $file
+     * @param string $version
+     */
 	public function __construct ( $file = '', $version = '1.0.0' ) {
         date_default_timezone_set('Asia/Omsk');
         $this->_version = $version;

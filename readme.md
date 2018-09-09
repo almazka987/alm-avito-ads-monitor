@@ -3,7 +3,7 @@
 :triangular_flag_on_post: Attention! The plugin is under development. 
 Stable operation is not guaranteed.
 
-:page_facing_up: [Читать это на русском языке](https://github.com/aliowebdeveloper/alio-avito-ads-monitor/readme.ru.md)
+:page_facing_up: [Читать это на русском языке](https://github.com/aliowebdeveloper/alio-avito-ads-monitor/blob/master/readme.ru.md)
 
 Alio Avito Ads Monitor is a plugin for automatically searching ads on Avito site.
 
