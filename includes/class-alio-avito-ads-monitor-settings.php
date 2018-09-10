@@ -115,15 +115,15 @@ class Alio_Avito_Ads_Monitor_Settings {
                     'type'          => 'text',
                     'default'       => '',
                     'placeholder'   => '',
-                    'description'   => 'Example: "Dog, cat, bird"',
+                    'description'   => __( 'Example: "Dog, cat, bird"', 'alio-avito-ads-monitor' )
                 ),
                 array(
                     'id'            => 'avito_email',
-                    'label'         => __( 'Notify to e-mail:' , 'alio-avito-ads-monitor' ),
+                    'label'         => __( 'Notify to e-mail' , 'alio-avito-ads-monitor' ),
                     'type'          => 'text',
                     'default'       => '',
                     'placeholder'   => '',
-                    'description'   => 'Please enter your email address to receive notification in case of success finding new ads according to your request',
+                    'description'   => __( 'Please enter your email address to receive notification in case of success finding new ads according to your request', 'alio-avito-ads-monitor' ),
                 ),
             )
         );
@@ -243,16 +243,17 @@ class Alio_Avito_Ads_Monitor_Settings {
         if ( !empty( $this->parent->avito_db_data ) && !empty( $this->parent->avito_keys_option ) ) {
             $new_data = json_decode($this->parent->avito_db_data[0]->new_data, true);
             $all_data = json_decode($this->parent->avito_db_data[0]->data, true);
+            $city_from_opts = get_option('aam_avito_city');
 
             $keywords = $this->parent->avito_keywords_array;
             $other_data = array_diff_key($all_data, $new_data);
 
-            $descr_text = ($this->parent->avito_city_option && $this->parent->avito_keys_option) ? __('Search Ads in ', 'alio-avito-ads-monitor') . $this->parent->avito_city_option . __(' city using keywords: ', 'alio-avito-ads-monitor') . $this->parent->avito_keys_option : __('City and search keyword was not specified!', 'alio-avito-ads-monitor');
+            $descr_text = ($this->parent->avito_city_option && $this->parent->avito_keys_option) ? __('Search Ads in ', 'alio-avito-ads-monitor') . $city_from_opts . __(' city using keywords: ', 'alio-avito-ads-monitor') . $this->parent->avito_keys_option : __('City and search keyword was not specified!', 'alio-avito-ads-monitor');
 
             $out .= '<div class="last-monitor-holder"><div class="title-block"><h2>' . __('Last Avito Monitor Results', 'alio-avito-ads-monitor') . '</h2>
             <p class="last-monitor-descr">' . $descr_text . '</p>';
             if (!empty($this->parent->avito_db_data[0]->search_date)) {
-                $out .= '<p class="last-monitor-descr">Last Parsing ' . $this->parent->avito_db_data[0]->search_date . '</p>';
+                $out .= '<p class="last-monitor-descr">' . __( 'Last Parsing ', 'alio-avito-ads-monitor' ) . $this->parent->avito_db_data[0]->search_date . '</p>';
             }
             $out .= '</div><div class="last-monitor-wrapper"><div class="last-monitor-loader"></div>';
 
@@ -272,14 +273,14 @@ class Alio_Avito_Ads_Monitor_Settings {
                             $img = !empty( $item['image'] ) ? $item['image'] : '';
                             $dscr = !empty( $item['description'] ) ? $item['description'] : '';
                             if ($item['keyword'] == $k_word) {
-                                $out .= '<div class="row item-block item' . $item_id . '"><div class="cell monitor-item image">' . $img . '</div><div class="cell monitor-item">' . $dscr . '</div><div class="cell monitor-item"><a href="" class="exclude-item js-avito-exclude" data-exclude-id="' . $item_id . '">Exclude item from monitoring</a><div class="bulk-checkbox-holder"><h3>or</h3><label class="checkcontainer"><span class="bulk-checkbox-title">bulk exclude</span><input type="checkbox" name="bulk-exclude-checks" data-exclude-id="' . $item_id . '"></label></div></div></div>';
+                                $out .= '<div class="row item-block item' . $item_id . '"><div class="cell monitor-item image">' . $img . '</div><div class="cell monitor-item">' . $dscr . '</div><div class="cell monitor-item"><a href="" class="exclude-item js-avito-exclude" data-exclude-id="' . $item_id . '">' . __( 'Exclude item from monitoring', 'alio-avito-ads-monitor' ) .'</a><div class="bulk-checkbox-holder"><h3>' . __( 'or', 'alio-avito-ads-monitor') . '</h3><label class="checkcontainer"><span class="bulk-checkbox-title">' . __( 'bulk exclude', 'alio-avito-ads-monitor') . '</span><input type="checkbox" name="bulk-exclude-checks" data-exclude-id="' . $item_id . '"></label></div></div></div>';
                             }
                         }
                     }
                     $out .= '</div><!-- End Last monitor table --></div>';
                 }
             }
-            $out .= '<div class="footer-block last-monitor-option-table"><div class="row"><div class="cell"></div><div class="cell"></div><div class="cell"><button class="button-primary js-bulk-avito-exclude">Bulk Exclude Items</button></div></div></div>';
+            $out .= '<div class="footer-block last-monitor-option-table"><div class="row"><div class="cell"></div><div class="cell"></div><div class="cell"><button class="button-primary js-bulk-avito-exclude">' . __( 'Bulk Exclude Items', 'alio-avito-ads-monitor') . '</button></div></div></div>';
             $out .= '</div></div>';
         }
         return $out;

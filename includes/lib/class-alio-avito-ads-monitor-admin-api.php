@@ -317,5 +317,4 @@ class Alio_Avito_Ads_Monitor_Admin_API {
             }
         }
     }
-
 }

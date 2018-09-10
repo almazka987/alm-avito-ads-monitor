@@ -1,16 +1,18 @@
-# Copyright (C) 2014 Alio Avito Ads Monitor
-# This file is distributed under the same license as the Alio Avito Ads Monitor package.
+# Translation of 4.5.x in Russian
+# This file is distributed under the same license as the 4.5.x package.
 msgid ""
 msgstr ""
-"Project-Id-Version: Alio Avito Ads Monitor 1.0\n"
-"Report-Msgid-Bugs-To: https://github.com/aliowebdeveloper/alio-avito-ads-monitor/issues\n"
-"POT-Creation-Date: 2014-04-07 11:28:06+00:00\n"
+
+"PO-Revision-Date: 2018-09-10 18:04:14+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2014-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: GlotPress/2.1.0-alpha\n"
+"Project-Id-Version: 4.5.x\n"
+
+msgid "Save Settings"
+msgstr "Сохранить настройки"
 
 msgid "Settings"
 msgstr "Настройки"
@@ -21,6 +23,9 @@ msgstr "Настройки мониторинга объявлений сайт�
 msgid "Enable Avito Ads Monitoring"
 msgstr "Вкл мониторинг сайта Avito"
 
+msgid "Notify to e-mail"
+msgstr "Отправлять уведомления на e-mail"
+
 msgid "Parsing Settings"
 msgstr "Настройки для поиска объявлений"
 
@@ -30,23 +35,20 @@ msgstr "Поиск по городу"
 msgid "Keywords comma separated"
 msgstr "Ключевые слова через запятую"
 
-msgid 'Example: "Dog, cat, bird"'
-msgstr 'Например: "Собака, кошка, птичка"'
+msgid "Example: \"Dog, cat, bird\""
+msgstr "Например: \"Собака, кошка, птичка\""
 
 msgid "Please enter your email address to receive notification in case of success finding new ads according to your request"
 msgstr "Укажите свой электронный адрес для отправления уведомлений в случае обнаружения новых объявлений по вашему запросу"
-
-msgid "DaruDar Website Monitoring"
-msgstr "Мониторинг сайта DaruDar"
-
-msgid "Omskmama Website Monitoring"
-msgstr "Мониторинг сайта Омскмама"
 
 msgid "Select search categories"
 msgstr "Разделы для поиска"
 
 msgid "Avito Monitoring"
 msgstr "Мониторинг Авито"
+
+msgid "Keyword: "
+msgstr "Ключевое слово: "
 
 msgid "Avito site monitoring is not activated!"
 msgstr "Мониторинг сайта Авито не включен!"
@@ -76,13 +78,22 @@ msgid "Go to Settings Page to customize settings or exclude items"
 msgstr "Перейти на страницу для настройки или исключения пунтов"
 
 msgid "Exclude item from monitoring"
-msgstr "Исключить из отслеживания"
+msgstr "Исключить это из отслеживания"
+
+msgid "or"
+msgstr "или"
+
+msgid "bulk exclude"
+msgstr "групповое исключение"
+
+msgid "Bulk Exclude Items"
+msgstr "Исключить все отмеченные"
 
 msgid "Last Avito Monitor Results"
 msgstr "Последние результаты мониторинга Авито"
 
-msgid "Last Parsing"
-msgstr "Дата сканирования"
+msgid "Last Parsing "
+msgstr "Дата сканирования "
 
 msgid "Founded updates by keywords: "
 msgstr "Обнаружены обновления по ключевым словам: "

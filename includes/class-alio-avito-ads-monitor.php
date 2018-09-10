@@ -96,9 +96,12 @@ class Alio_Avito_Ads_Monitor {
 
         // Load plugin environment variables
         $this->file = $file;
-        $this->dir = dirname( $this->file );
+        $this->dir = plugin_dir_path( $file ); //$this->dir = dirname( $this->file );
         $this->assets_dir = trailingslashit( $this->dir ) . 'assets';
         $this->assets_url = esc_url( trailingslashit( plugins_url( '/assets/', $this->file ) ) );
+
+        // Handle localisation
+        $this->load_localisation();
 
         $this->upd_avito_options();
         $this->avito_monitor_data = array();
@@ -117,15 +120,12 @@ class Alio_Avito_Ads_Monitor {
 
         add_action('updated_option', array( $this, 'new_start_after_save_options' ), 10, 2);
 
-		// Load API for generic admin functions
-		if ( is_admin() ) {
-			$this->admin = new Alio_Avito_Ads_Monitor_Admin_API();
-		}
+        // Load API for generic admin functions
+        if ( is_admin() ) {
+            $this->admin = new Alio_Avito_Ads_Monitor_Admin_API();
+        }
 
-		// Handle localisation
-		$this->load_localisation();
-
-		// Start searching
+        // Start searching
         $this->load_searching();
 
 	} // End __construct()
@@ -184,6 +184,16 @@ class Alio_Avito_Ads_Monitor {
         ) );
     }
 
+    /*
+    *  Wrapper for the get_locale() function
+    *  @type	function
+    *  @param	n/a
+    *  @return	(string)
+    */
+    public function aam_get_locale() {
+        return is_admin() && function_exists('get_user_locale') ? get_user_locale() : get_locale();
+    }
+
 	/**
 	 * Load plugin localisation
 	 * @access  public
@@ -191,7 +201,18 @@ class Alio_Avito_Ads_Monitor {
 	 * @return  void
 	 */
 	public function load_localisation() {
-		load_plugin_textdomain( 'alio-avito-ads-monitor', false, dirname( plugin_basename( $this->file ) ) . '/lang/' );
+        // vars
+        $domain = 'alio-avito-ads-monitor';
+        $locale = apply_filters( 'plugin_locale', $this->aam_get_locale(), $domain );
+        $mofile = $domain . '-' . $locale . '.mo';
+
+        // load from the languages directory first
+        load_textdomain( $domain, WP_LANG_DIR . '/plugins/' . $mofile );
+
+        // load from plugin lang folder
+        load_textdomain( $domain, $this->dir . '/lang/' . $mofile );
+
+		//$res = load_plugin_textdomain( 'alio-avito-ads-monitor', false, dirname( plugin_basename( $this->file ) ) . '/lang/' . $mofile );
 	} // End load_localisation ()
 
     /**
