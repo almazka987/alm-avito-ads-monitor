@@ -83,6 +83,14 @@ class Alio_Avito_Ads_Monitor {
     public $avito_monitor_data;
 
     /**
+     * Block our IP on Avito ru
+     * @var     bool
+     * @access  public
+     * @since   1.0.0
+     */
+    public $blocked;
+
+    /**
      * Constructor function.
      * @access  public
      * @since   1.0.0
@@ -93,6 +101,7 @@ class Alio_Avito_Ads_Monitor {
         date_default_timezone_set('Europe/Moscow');
         $this->_version = $version;
         $this->_token = 'alio_avito_ads_monitor';
+        $this->blocked = false;
 
         // Load plugin environment variables
         $this->file = $file;
@@ -282,46 +291,52 @@ class Alio_Avito_Ads_Monitor {
      */
     public function lets_parse_avito_page( $key, $page ) {
         $cnt = 0;
-        $city = $this->avito_city_option ? $this->avito_city_option : 'omsk';
+        $city = $this->avito_city_option ?: '';
         $p_request = ( $page == 0 ) ? '' : 'p=' . $page . '&';
         $url = 'https://www.avito.ru/' . $city . '?' . $p_request . 'q=' . $key;
+
         $key_id = $this->transliterate( $this->clear( $key ) );
         $file = file_get_contents( $url );
 
         if ( $doc = phpQuery::newDocumentHTML( $file, 'utf-8' ) ) {
+
             if ( $page == 0 ) {
                 $cnt = $doc->find('div.pagination-pages > a.pagination-page' )->count();
             }
 
-            foreach ( $doc->find('div.item.item_table') as $item_table ) {
-                $item_table = pq($item_table);
-                $avito_item_id = $key_id . $item_table->attr('id');
-                $exclude_arr = !empty( $this->avito_db_data[0]->exclude_items ) ? json_decode( $this->avito_db_data[0]->exclude_items , true ) : array();
+            if ( $doc->find('div.item.item_table') ) {
+                foreach ($doc->find('div.item.item_table') as $item_table) {
+                    $item_table = pq($item_table);
+                    $avito_item_id = $key_id . $item_table->attr('id');
+                    $exclude_arr = !empty($this->avito_db_data[0]->exclude_items) ? json_decode($this->avito_db_data[0]->exclude_items, true) : array();
 
-                if ( !empty( $exclude_arr ) && in_array( $avito_item_id, $exclude_arr ) ) continue;
+                    if (!empty($exclude_arr) && in_array($avito_item_id, $exclude_arr)) continue;
 
-                $bad_symbols = array('background-image: url(', ')', ';');
-                $img_from_ul_style = $item_table->find('a.large-picture .item-slider-list .item-slider-item:eq(0) div.item-slider-image')->attr('style');
-                $img_from_ul_srcpath = $item_table->find('a.large-picture .item-slider-list .item-slider-item:eq(0) div.item-slider-image')->attr('data-srcpath');
-                $img_from_a = $item_table->find('a.large-picture img.large-picture')->attr('src');
-                $item_title = $item_table->find('div.item_table-header > h3 > a span')->text();
-                $item_link = $item_table->find('div.item_table-header > h3 > a')->attr('href');
-                if ( $item_link ) {
-                    $item_link = 'https://www.avito.ru/' . $item_link;
+                    $bad_symbols = array('background-image: url(', ')', ';');
+                    $img_from_ul_style = $item_table->find('a.large-picture .item-slider-list .item-slider-item:eq(0) div.item-slider-image')->attr('style');
+                    $img_from_ul_srcpath = $item_table->find('a.large-picture .item-slider-list .item-slider-item:eq(0) div.item-slider-image')->attr('data-srcpath');
+                    $img_from_a = $item_table->find('a.large-picture img.large-picture')->attr('src');
+                    $item_title = $item_table->find('div.item_table-header > h3 > a span')->text();
+                    $item_link = $item_table->find('div.item_table-header > h3 > a')->attr('href');
+                    if ($item_link) {
+                        $item_link = 'https://www.avito.ru/' . $item_link;
+                    }
+                    $item_price = $item_table->find('div.item_table-header span.price')->html();
+
+                    if ($img_from_ul_style && !$img_from_ul_srcpath) {
+                        $img_from_ul_style = 'http:' . str_replace($bad_symbols, '', $img_from_ul_style);
+                        $this->avito_monitor_data[$avito_item_id]['image'] = '<img alt="" src="' . $img_from_ul_style . '">';
+                    } elseif ($img_from_ul_srcpath) {
+                        $this->avito_monitor_data[$avito_item_id]['image'] = '<img alt="" src="http:' . $img_from_ul_srcpath . '">';
+                    } elseif ($img_from_a) {
+                        $img_from_a = str_replace(array('//', 'https://', 'http://'), 'http://', $img_from_a);
+                        $this->avito_monitor_data[$avito_item_id]['image'] = '<img alt="" src="' . $img_from_a . '">';
+                    }
+                    $this->avito_monitor_data[$avito_item_id]['keyword'] = $key;
+                    $this->avito_monitor_data[$avito_item_id]['description'] = '<div><h3><a href="' . $item_link . '" target="blank">' . $item_title . '</a></h3>' . $item_price . '</div>';
                 }
-                $item_price = $item_table->find('div.item_table-header span.price')->html();
-
-                if ( $img_from_ul_style && !$img_from_ul_srcpath ) {
-                    $img_from_ul_style = 'http:' . str_replace( $bad_symbols, '', $img_from_ul_style );
-                    $this->avito_monitor_data[$avito_item_id]['image'] = '<img alt="" src="' . $img_from_ul_style . '">';
-                } elseif ( $img_from_ul_srcpath ) {
-                    $this->avito_monitor_data[$avito_item_id]['image'] = '<img alt="" src="http:' . $img_from_ul_srcpath . '">';
-                } elseif ( $img_from_a ) {
-                    $img_from_a = str_replace( array('//', 'https://', 'http://'), 'http://', $img_from_a );
-                    $this->avito_monitor_data[$avito_item_id]['image'] = '<img alt="" src="' . $img_from_a . '">';
-                }
-                $this->avito_monitor_data[$avito_item_id]['keyword'] = $key;
-                $this->avito_monitor_data[$avito_item_id]['description'] = '<div><h3><a href="' . $item_link . '" target="blank">' . $item_title. '</a></h3>' . $item_price . '</div>';
+            } else {
+                $this->blocked = true;
             }
         }
 
@@ -401,12 +416,13 @@ class Alio_Avito_Ads_Monitor {
         $other_data = array_diff_key( $all_data, $new_data );
 
         $msg  = '';
-        $descr_text = ( $this->avito_city_option && $this->avito_keys_option ) ? __( 'Founded updates by keywords: ', 'alio-avito-ads-monitor' ) : '';
+        $descr_text = ( $this->avito_city_option && $this->avito_keys_option ) ? __( 'Founded updates by keywords: ', 'alio-avito-ads-monitor' ) . implode(', ', $this->get_new_keys_arr() ) : '';
+        $descr_text = ( $this->avito_city_option && $this->avito_keys_option ) ? __( 'Founded updates by keywords: ', 'alio-avito-ads-monitor' ) . implode(', ', $this->get_new_keys_arr() ) : '';
         $msg .= '<div style="text-align: right;"><a href="' . get_site_url() . '/wp-admin/options-general.php?page=alio_avito_ads_monitor_settings" target="blank">' . __( 'Go to Settings Page to customize settings or exclude items', 'alio-avito-ads-monitor' ) . '</a></div>';
         $msg .= '<div class="last-monitor-holder" style="min-height: 100%;margin: 0;padding: 0;background-color: #c4d3f6;border-radius: 25px;max-width: 900px;"><div class="title-block"><h2 style="padding: 20px;border-bottom: 1px dashed;text-align: center;">' . __( 'Avito Monitoring', 'alio-avito-ads-monitor' ) . '</h2>
         <p style="font-size: 14px;text-align: center;">' . $descr_text . '</p>';
         if ( !empty( $this->avito_db_data[0]->search_date ) ) {
-            $msg .= '<p style="font-size: 14px;text-align: center;">Last Parsing ' . $this->avito_db_data[0]->search_date . '</p>';
+            $msg .= '<p style="font-size: 14px;text-align: center;">' . __( 'Last Parsing ', 'alio-avito-ads-monitor' ) . $this->avito_db_data[0]->search_date . '</p>';
         }
         $msg .= '</div><div class="last-monitor-wrapper">';
 
@@ -418,12 +434,14 @@ class Alio_Avito_Ads_Monitor {
 
                 foreach ($new_data as $item) {
                     if ( $item['keyword'] == $k_word ) {
-                        $msg .= '<div class="row" style="display: table-row;background: #fbc3d5;"><div class="cell image" style="text-align: center;display: table-cell;vertical-align: middle;width: 200px;padding: 20px;border-bottom: 1px solid #fff;">' . $item['image'] . '</div><div class="cell" style="display: table-cell;vertical-align: middle;width: 200px;padding: 20px;border-bottom: 1px solid #fff;">' . $item['description'] . '</div></div>';
+                        $img = isset( $item['image'] ) ? $item['image'] : '';
+                        $msg .= '<div class="row" style="display: table-row;background: #fbc3d5;"><div class="cell image" style="text-align: center;display: table-cell;vertical-align: middle;width: 200px;padding: 20px;border-bottom: 1px solid #fff;">' . $img . '</div><div class="cell" style="display: table-cell;vertical-align: middle;width: 200px;padding: 20px;border-bottom: 1px solid #fff;">' . $item['description'] . '</div></div>';
                     }
                 }
                 foreach ($other_data as $oth_item) {
                     if ( $oth_item['keyword'] == $k_word ) {
-                        $msg .= '<div class="row" style="display: table-row;"><div class="cell image" style="text-align: center;display: table-cell;vertical-align: middle;width: 200px;padding: 20px;border-bottom: 1px solid #fff;">' . $oth_item['image'] . '</div><div class="cell" style="display: table-cell;vertical-align: middle;width: 200px;padding: 20px;border-bottom: 1px solid #fff;">' . $oth_item['description'] . '</div></div>';
+                        $img = isset( $oth_item['image'] ) ? $oth_item['image'] : '';
+                        $msg .= '<div class="row" style="display: table-row;"><div class="cell image" style="text-align: center;display: table-cell;vertical-align: middle;width: 200px;padding: 20px;border-bottom: 1px solid #fff;">' . $img . '</div><div class="cell" style="display: table-cell;vertical-align: middle;width: 200px;padding: 20px;border-bottom: 1px solid #fff;">' . $oth_item['description'] . '</div></div>';
                     }
                 }
 
@@ -434,7 +452,7 @@ class Alio_Avito_Ads_Monitor {
         $msg .= '<div class="last-monitor-option-table" style="border-top: 1px dashed #fff;display: table;width: 100%;"><div style="display: table-row;"><div style="display: table-cell;vertical-align: middle;width: 200px;padding: 20px;"></div><div style="display: table-cell;vertical-align: middle;width: 200px;padding: 20px;"></div><div style="display: table-cell;vertical-align: middle;width: 200px;padding: 20px;"></div></div></div>';
         $msg .= '</div><!-- End last-monitor-wrapper --></div>';
 
-        $subject = "Avito Parsing Info";
+        $subject = __( 'Avito Parsing Info', 'alio-avito-ads-monitor' );
         $headers = "Content-Type: text/html \r\n From: Alio Avito Ads Monitor <noanswer@". $_SERVER['HTTP_HOST'] .">" . "\r\n";
         wp_mail( $this->avito_email_option, $subject, $msg, $headers );
     }

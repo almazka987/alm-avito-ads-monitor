@@ -1,8 +1,5 @@
 # Alio Avito Ads Monitor
 
-:triangular_flag_on_post: Attention! The plugin is under development. 
-Stable operation is not guaranteed.
-
 :page_facing_up: [Читать это на русском языке](https://github.com/aliowebdeveloper/alio-avito-ads-monitor/blob/master/readme.ru.md)
 
 Alio Avito Ads Monitor is a plugin for automatically searching ads on Avito site.
@@ -18,6 +15,9 @@ This plugin will do the search for you in the background and if successful, the 
 ![Avito ads automatic search results in email notification](https://frantic-coding.000webhostapp.com/wp-content/uploads/2018/09/screenshot2.jpg)
 
 There is also the opportunity to observe the statistics of automatically queries, exclude wrong items from next parsing. Also on the plugin settings page you can see the results of automatic queries.
+
+:triangular_flag_on_post: Attention! Automatic search ads is based on a simple http parsing using PHPQuery library because Avito website does not provide API for third-party appeals on the site for getting information about goods upon request.
+So downloading the results of monitoring on the Settings Page of the plugin may not be quick.
 
 ![Avito Monitor Results on the Settings Page](https://frantic-coding.000webhostapp.com/wp-content/uploads/2018/09/screenshot1.jpg)
 
@@ -44,7 +44,7 @@ Follow the steps below:
 ## Changelog
 
 = 1.0 =
-* 2018-08-28
+* 2018-09-11
 * Initial release
 
 
