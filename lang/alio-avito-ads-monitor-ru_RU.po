@@ -77,8 +77,8 @@ msgstr "Новые объявления по ключевому слову: "
 msgid "Go to Settings Page to customize settings or exclude items"
 msgstr "Перейти на страницу для настройки или исключения пунтов"
 
-msgid "Exclude item from monitoring"
-msgstr "Исключить это из отслеживания"
+msgid "Exclude from monitoring"
+msgstr "Исключить из отслеживания"
 
 msgid "or"
 msgstr "или"
@@ -95,5 +95,14 @@ msgstr "Последние результаты мониторинга Авит�
 msgid "Last Parsing "
 msgstr "Дата сканирования "
 
+msgid "Avito Parsing Info"
+msgstr "Новые объявления на сайте Авито"
+
 msgid "Founded updates by keywords: "
 msgstr "Обнаружены обновления по ключевым словам: "
+
+msgid "go to avito website"
+msgstr "перейти на Авито"
+
+msgid "It seems that you are too frequently changed settings and the site Avito this activity seemed suspicious. There is nothing to worry, just go to the site avito and confirm that you are not a robot - "
+msgstr "Похоже, вы слишком часто меняли настройки и сайту Авито эта активность показалась подозрительной. В этом нет ничего страшного, просто для возобновления доступа нужно перейти на сайт Авито и подтвердить, что вы не робот - "

@@ -123,8 +123,15 @@ a.open-container {
     margin-top: 15px;
 }
 
+.bulk-checkbox-holder .checkcontainer input {
+    margin-top: 11px;
+}
+
 .bulk-checkbox-holder .bulk-checkbox-title {
     margin-right: 10px;
+    display: block;
+    max-width: 100px;
+    float: left;
 }
 
 .clearfix {

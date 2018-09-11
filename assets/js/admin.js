@@ -1,27 +1,4 @@
 jQuery( document ).ready( function ( $ ) {
-    $('.last-monitor-table .js-avito-exclude').on('click', function(event) {
-        event.preventDefault();
-        var itemID = $(this).data('exclude-id');
-        $hideContainer = $(this).parent('.monitor-item').parent('.item' + itemID);
-        $.ajax({
-            type: "POST",
-            data: {
-                action: 'exclude_avito_item',
-                itemID: itemID,
-            },
-            url: ajaxUrl.url,
-            beforeSend: function(){
-                $('.last-monitor-loader').fadeIn();
-            },
-            success: function(data) {
-                if(+data === 1) {
-                    $hideContainer.fadeOut();
-                    $('.last-monitor-loader').fadeOut();
-                }
-            }
-        });
-    });
-
     $('.last-monitor-option-table .js-bulk-avito-exclude').on('click', function(event) {
         event.preventDefault();
         var excludeIDs = [];
