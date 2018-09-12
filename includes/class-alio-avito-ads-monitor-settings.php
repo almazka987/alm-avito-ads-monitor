@@ -255,7 +255,7 @@ class Alio_Avito_Ads_Monitor_Settings {
             $out .= '<div class="last-monitor-holder"><div class="title-block"><h2>' . __('Last Avito Monitor Results', 'alio-avito-ads-monitor') . '</h2>
             <p class="last-monitor-descr">' . $descr_text . '</p>';
             if (!empty($this->parent->avito_db_data[0]->search_date)) {
-                $out .= '<p class="last-monitor-descr">' . __( 'Last Parsing ', 'alio-avito-ads-monitor' ) . $this->parent->avito_db_data[0]->search_date . '</p>';
+                $out .= '<p class="last-monitor-descr">' . __( 'Last Parsing ', 'alio-avito-ads-monitor' ) . $this->parent->avito_db_data[0]->search_date . ' MSK</p>';
             }
             $out .= '</div><div class="last-monitor-wrapper"><div class="last-monitor-loader"></div>';
 

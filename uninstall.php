@@ -14,4 +14,25 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
 
-// Do something here if plugin is being uninstalled.
+/**
+ * Delete all plugin options from Data Base
+ */
+
+$aam_options = array( 'enable', 'city', 'keys', 'email' );
+foreach ( $aam_options as $aam_option ) {
+    if (get_option('aam_avito_' . $aam_option) !== null) {
+        delete_option( 'aam_avito_' . $aam_option );
+    }
+}
+
+/**
+ * Delete plugin table from Data Base
+ */
+
+global $wpdb;
+$wpdb->show_errors( true );
+$table_name = $wpdb->prefix . 'alio_ads_monitor';
+if ( $wpdb->get_var("SHOW TABLES LIKE '$table_name'") ) {
+    $res = $wpdb->query( 'DROP TABLE ' . $wpdb->prefix . 'alio_ads_monitor' );
+}
+

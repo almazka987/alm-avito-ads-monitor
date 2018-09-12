@@ -232,20 +232,22 @@ class Alio_Avito_Ads_Monitor {
         global $wpdb;
         $wpdb->show_errors( true );
         $table_name = $wpdb->prefix . 'alio_ads_monitor';
-        $charset_collate = $wpdb->get_charset_collate();
-
-        $sql = "CREATE TABLE $table_name (
-            id int(11) NOT NULL AUTO_INCREMENT,
-            search_date datetime NOT NULL,
-            site tinytext NOT NULL,
-            data longtext NOT NULL,
-            new_data longtext NOT NULL,
-            exclude_items text NOT NULL,
-            PRIMARY KEY  (id)
-            ) $charset_collate;";
-
-        require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-        dbDelta( $sql );
+        if( !$wpdb->get_var("SHOW TABLES LIKE '$table_name'") ) {
+            $charset_collate = $wpdb->get_charset_collate();
+    
+            $sql = "CREATE TABLE $table_name (
+                id int(11) NOT NULL AUTO_INCREMENT,
+                search_date datetime NOT NULL,
+                site tinytext NOT NULL,
+                data longtext NOT NULL,
+                new_data longtext NOT NULL,
+                exclude_items text NOT NULL,
+                PRIMARY KEY  (id)
+                ) $charset_collate;";
+    
+            require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+            dbDelta( $sql );
+        }
     }
 
     public function upd_avito_db_data() {
@@ -422,7 +424,7 @@ class Alio_Avito_Ads_Monitor {
         $msg .= '<div class="last-monitor-holder" style="min-height: 100%;margin: 0;padding: 0;background-color: #c4d3f6;border-radius: 25px;max-width: 900px;"><div class="title-block"><h2 style="padding: 20px;border-bottom: 1px dashed;text-align: center;">' . __( 'Avito Monitoring', 'alio-avito-ads-monitor' ) . '</h2>
         <p style="font-size: 14px;text-align: center;">' . $descr_text . '</p>';
         if ( !empty( $this->avito_db_data[0]->search_date ) ) {
-            $msg .= '<p style="font-size: 14px;text-align: center;">' . __( 'Last Parsing ', 'alio-avito-ads-monitor' ) . $this->avito_db_data[0]->search_date . '</p>';
+            $msg .= '<p style="font-size: 14px;text-align: center;">' . __( 'Last Parsing ', 'alio-avito-ads-monitor' ) . $this->avito_db_data[0]->search_date . ' MSK</p>';
         }
         $msg .= '</div><div class="last-monitor-wrapper">';
 
