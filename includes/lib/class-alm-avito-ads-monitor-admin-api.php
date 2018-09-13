@@ -2,7 +2,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class Alio_Avito_Ads_Monitor_Admin_API {
+class Alm_Avito_Ads_Monitor_Admin_API {
 
     /**
      * Constructor function

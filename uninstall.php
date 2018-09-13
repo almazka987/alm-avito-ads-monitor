@@ -31,8 +31,8 @@ foreach ( $aam_options as $aam_option ) {
 
 global $wpdb;
 $wpdb->show_errors( true );
-$table_name = $wpdb->prefix . 'alio_ads_monitor';
+$table_name = $wpdb->prefix . 'alm_ads_monitor';
 if ( $wpdb->get_var("SHOW TABLES LIKE '$table_name'") ) {
-    $res = $wpdb->query( 'DROP TABLE ' . $wpdb->prefix . 'alio_ads_monitor' );
+    $res = $wpdb->query( 'DROP TABLE ' . $wpdb->prefix . 'alm_ads_monitor' );
 }
 

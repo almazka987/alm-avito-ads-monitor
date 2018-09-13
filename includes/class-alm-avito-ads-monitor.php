@@ -2,10 +2,10 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class Alio_Avito_Ads_Monitor {
+class Alm_Avito_Ads_Monitor {
 
 	/**
-	 * The single instance of Alio_Avito_Ads_Monitor.
+	 * The single instance of Alm_Avito_Ads_Monitor.
 	 * @var 	object
 	 * @access  private
 	 * @since 	1.0.0
@@ -100,7 +100,7 @@ class Alio_Avito_Ads_Monitor {
 	public function __construct ( $file = '', $version = '1.0.0' ) {
         date_default_timezone_set('Europe/Moscow');
         $this->_version = $version;
-        $this->_token = 'alio_avito_ads_monitor';
+        $this->_token = 'alm_avito_ads_monitor';
         $this->blocked = false;
 
         // Load plugin environment variables
@@ -131,7 +131,7 @@ class Alio_Avito_Ads_Monitor {
 
         // Load API for generic admin functions
         if ( is_admin() ) {
-            $this->admin = new Alio_Avito_Ads_Monitor_Admin_API();
+            $this->admin = new Alm_Avito_Ads_Monitor_Admin_API();
         }
 
         // Start searching
@@ -211,7 +211,7 @@ class Alio_Avito_Ads_Monitor {
 	 */
 	public function load_localisation() {
         // vars
-        $domain = 'alio-avito-ads-monitor';
+        $domain = 'alm-avito-ads-monitor';
         $locale = apply_filters( 'plugin_locale', $this->aam_get_locale(), $domain );
         $mofile = $domain . '-' . $locale . '.mo';
 
@@ -221,7 +221,7 @@ class Alio_Avito_Ads_Monitor {
         // load from plugin lang folder
         load_textdomain( $domain, $this->dir . '/lang/' . $mofile );
 
-		//$res = load_plugin_textdomain( 'alio-avito-ads-monitor', false, dirname( plugin_basename( $this->file ) ) . '/lang/' . $mofile );
+		//$res = load_plugin_textdomain( 'alm-avito-ads-monitor', false, dirname( plugin_basename( $this->file ) ) . '/lang/' . $mofile );
 	} // End load_localisation ()
 
     /**
@@ -231,7 +231,7 @@ class Alio_Avito_Ads_Monitor {
     private function db_install() {
         global $wpdb;
         $wpdb->show_errors( true );
-        $table_name = $wpdb->prefix . 'alio_ads_monitor';
+        $table_name = $wpdb->prefix . 'alm_ads_monitor';
         if( !$wpdb->get_var("SHOW TABLES LIKE '$table_name'") ) {
             $charset_collate = $wpdb->get_charset_collate();
     
@@ -253,7 +253,7 @@ class Alio_Avito_Ads_Monitor {
     public function upd_avito_db_data() {
         global $wpdb;
         $wpdb->show_errors( true );
-        $this->avito_db_data = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM ' . $wpdb->prefix . 'alio_ads_monitor WHERE site="%s"', 'avito' ) );
+        $this->avito_db_data = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM ' . $wpdb->prefix . 'alm_ads_monitor WHERE site="%s"', 'avito' ) );
     }
 
     /**
@@ -384,7 +384,7 @@ class Alio_Avito_Ads_Monitor {
         $new_data = $this->avito_search_new();
 
         if ( empty( $this->avito_db_data ) ) {
-            $wpdb->insert( $wpdb->prefix . 'alio_ads_monitor', array(
+            $wpdb->insert( $wpdb->prefix . 'alm_ads_monitor', array(
                 'ID' => '',
                 'search_date' => date('Y/m/d H:i:s', $search_date ),
                 'site' => $site,
@@ -392,7 +392,7 @@ class Alio_Avito_Ads_Monitor {
                 'new_data' => json_encode( $new_data, JSON_UNESCAPED_UNICODE ),
             ) );
         } else {
-            $wpdb->update( $wpdb->prefix . 'alio_ads_monitor', array(
+            $wpdb->update( $wpdb->prefix . 'alm_ads_monitor', array(
                 'search_date' => date('Y/m/d H:i:s', $search_date ),
                 'site' => $site,
                 'data' => json_encode( $this->avito_monitor_data, JSON_UNESCAPED_UNICODE ),
@@ -418,19 +418,19 @@ class Alio_Avito_Ads_Monitor {
         $other_data = array_diff_key( $all_data, $new_data );
 
         $msg  = '';
-        $descr_text = ( $this->avito_city_option && $this->avito_keys_option ) ? __( 'Founded updates by keywords: ', 'alio-avito-ads-monitor' ) . implode(', ', $this->get_new_keys_arr() ) : '';
-        $descr_text = ( $this->avito_city_option && $this->avito_keys_option ) ? __( 'Founded updates by keywords: ', 'alio-avito-ads-monitor' ) . implode(', ', $this->get_new_keys_arr() ) : '';
-        $msg .= '<div style="text-align: right;"><a href="' . get_site_url() . '/wp-admin/options-general.php?page=alio_avito_ads_monitor_settings" target="blank">' . __( 'Go to Settings Page to customize settings or exclude items', 'alio-avito-ads-monitor' ) . '</a></div>';
-        $msg .= '<div class="last-monitor-holder" style="min-height: 100%;margin: 0;padding: 0;background-color: #c4d3f6;border-radius: 25px;max-width: 900px;"><div class="title-block"><h2 style="padding: 20px;border-bottom: 1px dashed;text-align: center;">' . __( 'Avito Monitoring', 'alio-avito-ads-monitor' ) . '</h2>
+        $descr_text = ( $this->avito_city_option && $this->avito_keys_option ) ? __( 'Founded updates by keywords: ', 'alm-avito-ads-monitor' ) . implode(', ', $this->get_new_keys_arr() ) : '';
+        $descr_text = ( $this->avito_city_option && $this->avito_keys_option ) ? __( 'Founded updates by keywords: ', 'alm-avito-ads-monitor' ) . implode(', ', $this->get_new_keys_arr() ) : '';
+        $msg .= '<div style="text-align: right;"><a href="' . get_site_url() . '/wp-admin/options-general.php?page=alm_avito_ads_monitor_settings" target="blank">' . __( 'Go to Settings Page to customize settings or exclude items', 'alm-avito-ads-monitor' ) . '</a></div>';
+        $msg .= '<div class="last-monitor-holder" style="min-height: 100%;margin: 0;padding: 0;background-color: #c4d3f6;border-radius: 25px;max-width: 900px;"><div class="title-block"><h2 style="padding: 20px;border-bottom: 1px dashed;text-align: center;">' . __( 'Avito Monitoring', 'alm-avito-ads-monitor' ) . '</h2>
         <p style="font-size: 14px;text-align: center;">' . $descr_text . '</p>';
         if ( !empty( $this->avito_db_data[0]->search_date ) ) {
-            $msg .= '<p style="font-size: 14px;text-align: center;">' . __( 'Last Parsing ', 'alio-avito-ads-monitor' ) . $this->avito_db_data[0]->search_date . ' MSK</p>';
+            $msg .= '<p style="font-size: 14px;text-align: center;">' . __( 'Last Parsing ', 'alm-avito-ads-monitor' ) . $this->avito_db_data[0]->search_date . ' MSK</p>';
         }
         $msg .= '</div><div class="last-monitor-wrapper">';
 
         if ( !empty( $new_keywords ) ) {
             foreach( $new_keywords as $k_word ) {
-                $msg .= '<div class="table-header" style="overflow: hidden;padding: 20px;font-weight: bold;background: #6c7ae0;font-size: 14px;color: #000;text-align: center;"><h4 style="margin: 0;">' . __( 'Keyword: ', 'alio-avito-ads-monitor' ) . $k_word . '</h4></div>';
+                $msg .= '<div class="table-header" style="overflow: hidden;padding: 20px;font-weight: bold;background: #6c7ae0;font-size: 14px;color: #000;text-align: center;"><h4 style="margin: 0;">' . __( 'Keyword: ', 'alm-avito-ads-monitor' ) . $k_word . '</h4></div>';
 
                 $msg .= '<div class="table-scrolling-container" style="max-height: 500px;overflow-y: scroll;"><div class="last-monitor-table" style="display: table;width: 100%;">';
 
@@ -454,8 +454,8 @@ class Alio_Avito_Ads_Monitor {
         $msg .= '<div class="last-monitor-option-table" style="border-top: 1px dashed #fff;display: table;width: 100%;"><div style="display: table-row;"><div style="display: table-cell;vertical-align: middle;width: 200px;padding: 20px;"></div><div style="display: table-cell;vertical-align: middle;width: 200px;padding: 20px;"></div><div style="display: table-cell;vertical-align: middle;width: 200px;padding: 20px;"></div></div></div>';
         $msg .= '</div><!-- End last-monitor-wrapper --></div>';
 
-        $subject = __( 'Avito Parsing Info', 'alio-avito-ads-monitor' );
-        $headers = "Content-Type: text/html \r\n From: Alio Avito Ads Monitor <noanswer@". $_SERVER['HTTP_HOST'] .">" . "\r\n";
+        $subject = __( 'Avito Parsing Info', 'alm-avito-ads-monitor' );
+        $headers = "Content-Type: text/html \r\n From: Alm Avito Ads Monitor <noanswer@". $_SERVER['HTTP_HOST'] .">" . "\r\n";
         wp_mail( $this->avito_email_option, $subject, $msg, $headers );
     }
 
@@ -527,16 +527,16 @@ class Alio_Avito_Ads_Monitor {
     }
 
     /**
-     * Main Alio_Avito_Ads_Monitor Instance
+     * Main Alm_Avito_Ads_Monitor Instance
      *
-     * Ensures only one instance of Alio_Avito_Ads_Monitor is loaded or can be loaded.
+     * Ensures only one instance of Alm_Avito_Ads_Monitor is loaded or can be loaded.
      *
      * @since 1.0.0
      * @static
-     * @see Alio_Avito_Ads_Monitor()
+     * @see Alm_Avito_Ads_Monitor()
      * @param string $file
      * @param string $version
-     * @return Alio_Avito_Ads_Monitor instance
+     * @return Alm_Avito_Ads_Monitor instance
      */
 	public static function instance ( $file = '', $version = '1.0.0' ) {
 		if (self::$_instance === null) {

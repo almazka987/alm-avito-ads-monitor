@@ -2,10 +2,10 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class Alio_Avito_Ads_Monitor_Settings {
+class Alm_Avito_Ads_Monitor_Settings {
 
 	/**
-	 * The single instance of Alio_Avito_Ads_Monitor_Settings.
+	 * The single instance of Alm_Avito_Ads_Monitor_Settings.
 	 * @var 	object
 	 * @access  private
 	 * @since 	1.0.0
@@ -70,7 +70,7 @@ class Alio_Avito_Ads_Monitor_Settings {
 	 * @return void
 	 */
 	public function add_menu_item () {
-		add_options_page( __( 'Ads Monitor Settings', 'alio-avito-ads-monitor' ) , __( 'Avito Ads Monitor', 'alio-avito-ads-monitor' ) , 'manage_options' , $this->parent->_token . '_settings' ,  array( $this, 'settings_page' ) );
+		add_options_page( __( 'Ads Monitor Settings', 'alm-avito-ads-monitor' ) , __( 'Avito Ads Monitor', 'alm-avito-ads-monitor' ) , 'manage_options' , $this->parent->_token . '_settings' ,  array( $this, 'settings_page' ) );
 	}
 
 	/**
@@ -79,7 +79,7 @@ class Alio_Avito_Ads_Monitor_Settings {
 	 * @return array 		Modified links
 	 */
 	public function add_settings_link ( $links ) {
-		$settings_link = '<a href="options-general.php?page=' . $this->parent->_token . '_settings">' . __( 'Settings', 'alio-avito-ads-monitor' ) . '</a>';
+		$settings_link = '<a href="options-general.php?page=' . $this->parent->_token . '_settings">' . __( 'Settings', 'alm-avito-ads-monitor' ) . '</a>';
   		array_push( $links, $settings_link );
   		return $links;
 	}
@@ -96,14 +96,14 @@ class Alio_Avito_Ads_Monitor_Settings {
             'fields'                => array(
                 array(
                     'id' 			=> 'avito_enable',
-                    'label'			=> __( 'Enable Avito Ads Monitoring', 'alio-avito-ads-monitor' ),
+                    'label'			=> __( 'Enable Avito Ads Monitoring', 'alm-avito-ads-monitor' ),
                     'description'	=> __( '' ),
                     'type'			=> 'checkbox',
                     'default'		=> ''
                 ),
                 array(
                     'id'            => 'avito_city',
-                    'label'         => __( 'Search in City' , 'alio-avito-ads-monitor' ),
+                    'label'         => __( 'Search in City' , 'alm-avito-ads-monitor' ),
                     'type'          => 'text',
                     'default'       => '',
                     'placeholder'   => '',
@@ -111,19 +111,19 @@ class Alio_Avito_Ads_Monitor_Settings {
                 ),
                 array(
                     'id'            => 'avito_keys',
-                    'label'         => __( 'Keywords comma separated' , 'alio-avito-ads-monitor' ),
+                    'label'         => __( 'Keywords comma separated' , 'alm-avito-ads-monitor' ),
                     'type'          => 'text',
                     'default'       => '',
                     'placeholder'   => '',
-                    'description'   => __( 'Example: "Dog, cat, bird"', 'alio-avito-ads-monitor' )
+                    'description'   => __( 'Example: "Dog, cat, bird"', 'alm-avito-ads-monitor' )
                 ),
                 array(
                     'id'            => 'avito_email',
-                    'label'         => __( 'Notify to e-mail' , 'alio-avito-ads-monitor' ),
+                    'label'         => __( 'Notify to e-mail' , 'alm-avito-ads-monitor' ),
                     'type'          => 'text',
                     'default'       => '',
                     'placeholder'   => '',
-                    'description'   => __( 'Please enter your email address to receive notification in case of success finding new ads according to your request', 'alio-avito-ads-monitor' ),
+                    'description'   => __( 'Please enter your email address to receive notification in case of success finding new ads according to your request', 'alm-avito-ads-monitor' ),
                 ),
             )
         );
@@ -178,7 +178,7 @@ class Alio_Avito_Ads_Monitor_Settings {
 
 		// Build page HTML
 		$html = '<div class="wrap" id="' . $this->parent->_token . '_settings">' . "\n";
-			$html .= '<h2 class="dashicons-before dashicons-admin-generic options-icon">' . __( 'Avito Ads Monitor Settings' , 'alio-avito-ads-monitor' ) . '</h2>' . "\n";
+			$html .= '<h2 class="dashicons-before dashicons-admin-generic options-icon">' . __( 'Avito Ads Monitor Settings' , 'alm-avito-ads-monitor' ) . '</h2>' . "\n";
 
 			$html .= '<form method="post" action="options.php" enctype="multipart/form-data">' . "\n";
 
@@ -190,7 +190,7 @@ class Alio_Avito_Ads_Monitor_Settings {
 
 				$html .= '<p class="submit">' . "\n";
 					$html .= '<input type="hidden" name="tab" value="" />' . "\n";
-					$html .= '<input name="Submit" type="submit" class="button-primary" value="' . esc_attr( __( 'Save Settings' , 'alio-avito-ads-monitor' ) ) . '" />' . "\n";
+					$html .= '<input name="Submit" type="submit" class="button-primary" value="' . esc_attr( __( 'Save Settings' , 'alm-avito-ads-monitor' ) ) . '" />' . "\n";
 				$html .= '</p>' . "\n";
 			$html .= '</form>' . "\n";
 
@@ -225,7 +225,7 @@ class Alio_Avito_Ads_Monitor_Settings {
             }
             global $wpdb;
                 $wpdb->show_errors( true );
-                $wpdb->update( $wpdb->prefix . 'alio_ads_monitor', array(
+                $wpdb->update( $wpdb->prefix . 'alm_ads_monitor', array(
                     'exclude_items' => json_encode( $exclude_arr, JSON_UNESCAPED_UNICODE )
                 ), array('id' => $this->parent->avito_db_data[0]->id) );
                 $this->parent->upd_avito_db_data();
@@ -241,6 +241,7 @@ class Alio_Avito_Ads_Monitor_Settings {
      */
     public function avito_last_monitor_results() {
         $out = '';
+
         if ( !empty( $this->parent->avito_db_data ) && !empty( $this->parent->avito_keys_option ) && $this->parent->avito_enable_option && !$this->parent->blocked ) {
             $new_data = json_decode($this->parent->avito_db_data[0]->new_data, true);
             $all_data = json_decode($this->parent->avito_db_data[0]->data, true);
@@ -250,24 +251,24 @@ class Alio_Avito_Ads_Monitor_Settings {
             $keywords = $this->parent->avito_keywords_array;
             $other_data = array_diff_key($all_data, $new_data);
 
-            $descr_text = ($this->parent->avito_city_option && $this->parent->avito_keys_option) ? __('Search Ads in ', 'alio-avito-ads-monitor') . $city_from_opts . __(' city using keywords: ', 'alio-avito-ads-monitor') . $this->parent->avito_keys_option : __('City and/or search keyword is not specified!', 'alio-avito-ads-monitor');
+            $descr_text = ($this->parent->avito_city_option && $this->parent->avito_keys_option) ? __('Search Ads in ', 'alm-avito-ads-monitor') . $city_from_opts . __(' city using keywords: ', 'alm-avito-ads-monitor') . $this->parent->avito_keys_option : __('City and/or search keyword is not specified!', 'alm-avito-ads-monitor');
 
-            $out .= '<div class="last-monitor-holder"><div class="title-block"><h2>' . __('Last Avito Monitor Results', 'alio-avito-ads-monitor') . '</h2>
+            $out .= '<div class="last-monitor-holder"><div class="title-block"><h2>' . __('Last Avito Monitor Results', 'alm-avito-ads-monitor') . '</h2>
             <p class="last-monitor-descr">' . $descr_text . '</p>';
             if (!empty($this->parent->avito_db_data[0]->search_date)) {
-                $out .= '<p class="last-monitor-descr">' . __( 'Last Parsing ', 'alio-avito-ads-monitor' ) . $this->parent->avito_db_data[0]->search_date . ' MSK</p>';
+                $out .= '<p class="last-monitor-descr">' . __( 'Last Parsing ', 'alm-avito-ads-monitor' ) . $this->parent->avito_db_data[0]->search_date . ' MSK</p>';
             }
             $out .= '</div><div class="last-monitor-wrapper"><div class="last-monitor-loader"></div>';
 
             if (!empty($keywords)) {
                 foreach ($keywords as $k_word) {
-                    $out .= '<div class="table-header"><h4 class="keyword-heading">' . __('Keyword: ', 'alio-avito-ads-monitor') . $k_word . '</h4></div>';
+                    $out .= '<div class="table-header"><h4 class="keyword-heading">' . __('Keyword: ', 'alm-avito-ads-monitor') . $k_word . '</h4></div>';
                     $out .= '<div class="table-scrolling-container"><div class="last-monitor-table" data-keyword="' . $k_word . '">';
                     if (!empty($new_data)) {
                         foreach ($new_data as $item_id => $item) {
                             if ($item['keyword'] == $k_word) {
                                 $img = isset( $item['image'] ) ? $item['image'] : '';
-                                $out .= '<div class="row new item-block item' . $item_id . '"><div class="cell monitor-item image">' . $img . '</div><div class="cell monitor-item">' . $item['description'] . '</div><div class="cell monitor-item"><div class="bulk-checkbox-holder"><label class="checkcontainer"><strong class="bulk-checkbox-title">' . __( 'Exclude from monitoring', 'alio-avito-ads-monitor') . '</strong><input type="checkbox" name="bulk-exclude-checks" data-exclude-id="' . $item_id . '"></label></div></div></div>';
+                                $out .= '<div class="row new item-block item' . $item_id . '"><div class="cell monitor-item image">' . $img . '</div><div class="cell monitor-item">' . $item['description'] . '</div><div class="cell monitor-item"><div class="bulk-checkbox-holder"><label class="checkcontainer"><strong class="bulk-checkbox-title">' . __( 'Exclude from monitoring', 'alm-avito-ads-monitor') . '</strong><input type="checkbox" name="bulk-exclude-checks" data-exclude-id="' . $item_id . '"></label></div></div></div>';
                             }
                         }
                     }
@@ -276,32 +277,32 @@ class Alio_Avito_Ads_Monitor_Settings {
                             $img = isset( $item['image'] ) ? $item['image'] : '';
                             $dscr = isset( $item['description'] ) ? $item['description'] : '';
                             if ($item['keyword'] == $k_word) {
-                                $out .= '<div class="row item-block item' . $item_id . '"><div class="cell monitor-item image">' . $img . '</div><div class="cell monitor-item">' . $dscr . '</div><div class="cell monitor-item"><div class="bulk-checkbox-holder"><label class="checkcontainer"><strong class="bulk-checkbox-title">' . __( 'Exclude from monitoring', 'alio-avito-ads-monitor') . '</strong><input type="checkbox" name="bulk-exclude-checks" data-exclude-id="' . $item_id . '"></label></div></div></div>';
+                                $out .= '<div class="row item-block item' . $item_id . '"><div class="cell monitor-item image">' . $img . '</div><div class="cell monitor-item">' . $dscr . '</div><div class="cell monitor-item"><div class="bulk-checkbox-holder"><label class="checkcontainer"><strong class="bulk-checkbox-title">' . __( 'Exclude from monitoring', 'alm-avito-ads-monitor') . '</strong><input type="checkbox" name="bulk-exclude-checks" data-exclude-id="' . $item_id . '"></label></div></div></div>';
                             }
                         }
                     }
                     $out .= '</div><!-- End Last monitor table --></div>';
                 }
             }
-            $out .= '<div class="footer-block last-monitor-option-table"><div class="row"><div class="cell"></div><div class="cell"></div><div class="cell"><button class="button-primary js-bulk-avito-exclude">' . __( 'Bulk Exclude Items', 'alio-avito-ads-monitor') . '</button></div></div></div>';
+            $out .= '<div class="footer-block last-monitor-option-table"><div class="row"><div class="cell"></div><div class="cell"></div><div class="cell"><button class="button-primary js-bulk-avito-exclude">' . __( 'Bulk Exclude Items', 'alm-avito-ads-monitor') . '</button></div></div></div>';
             $out .= '</div></div>';
         }
         if ( $this->parent->blocked ) {
-            $out .= __( 'It seems that you are too frequently changed settings and the site Avito this activity seemed suspicious. There is nothing to worry, just go to the site avito and confirm that you are not a robot - ', 'alio-avito-ads-monitor' ) . '<a href="https://www.avito.ru">' . __( 'go to avito website' ) . '</a>';
+            $out .= __( 'It seems that you are too frequently changed settings and the site Avito this activity seemed suspicious. There is nothing to worry, just go to the site avito and confirm that you are not a robot - ', 'alm-avito-ads-monitor' ) . '<a href="https://www.avito.ru">' . __( 'go to avito website' ) . '</a>';
         }
         return $out;
 	}
 
     /**
-     * Main Alio_Avito_Ads_Monitor_Settings Instance
+     * Main Alm_Avito_Ads_Monitor_Settings Instance
      *
-     * Ensures only one instance of Alio_Avito_Ads_Monitor_Settings is loaded or can be loaded.
+     * Ensures only one instance of Alm_Avito_Ads_Monitor_Settings is loaded or can be loaded.
      *
      * @since 1.0.0
      * @static
-     * @see Alio_Avito_Ads_Monitor()
+     * @see Alm_Avito_Ads_Monitor()
      * @param $parent
-     * @return Alio_Avito_Ads_Monitor_Settings instance
+     * @return Alm_Avito_Ads_Monitor_Settings instance
      */
 	public static function instance ( $parent ) {
 		if (self::$_instance === null) {

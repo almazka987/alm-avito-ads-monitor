@@ -1,4 +1,4 @@
-=== Alio Avito Ads Monitor ===
+=== Alm Avito Ads Monitor ===
 
 Contributors: Alio
 Donate link: https://frantic-coding.000webhostapp.com/donate/
@@ -9,7 +9,7 @@ Stable tag: 1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Alio Avito Ads Monitor is a plugin for automatically searching ads on Avito site.
+Alm Avito Ads Monitor is a plugin for automatically searching ads on Avito site.
 
 == Description ==
 
@@ -37,9 +37,9 @@ Follow the steps below:
 
 = I've got an idea/fix for the plugin =
 
-"Alio Avito Ads Monitor" is open source software.
+"Alm Avito Ads Monitor" is open source software.
 
-If you would like to contribute to this plugin then please fork it and send a pull request. I'll merge the request if it fits into the goals for the plugin and credit you in the [changelog](https://github.com/aliowebdeveloper/alio-avito-ads-monitor/blob/master/changelog.txt).
+If you would like to contribute to this plugin then please fork it and send a pull request. I'll merge the request if it fits into the goals for the plugin and credit you in the [changelog](https://github.com/almazka987/alm-avito-ads-monitor/blob/master/changelog.txt).
 
 == Changelog ==
 
