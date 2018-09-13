@@ -12,14 +12,14 @@ This plugin for those who do not want to spend extra time to go to the site Avit
 
 This plugin will do the search for you in the background and if successful, the program will be send you a notification about new goods on the Avito site to your e-mail.
 
-![Avito ads automatic search results in email notification](https://frantic-coding.000webhostapp.com/wp-content/uploads/2018/09/screenshot2.jpg)
+![Avito ads automatic search results in email notification](http://frantic-coding.000webhostapp.com/wp-content/uploads/2018/09/screenshot2.jpg)
 
 There is also the opportunity to observe the statistics of automatically queries, exclude wrong items from next parsing. Also on the plugin settings page you can see the results of automatic queries.
 
 :triangular_flag_on_post: Attention! Automatic search ads is based on a simple http parsing using PHPQuery library because Avito website does not provide API for third-party appeals on the site for getting information about goods upon request.
 So downloading the results of monitoring on the Settings Page of the plugin may not be quick.
 
-![Avito Monitor Results on the Settings Page](https://frantic-coding.000webhostapp.com/wp-content/uploads/2018/09/screenshot1.jpg)
+![Avito Monitor Results on the Settings Page](http://frantic-coding.000webhostapp.com/wp-content/uploads/2018/09/screenshot1.jpg)
 
 ## Usage
 
