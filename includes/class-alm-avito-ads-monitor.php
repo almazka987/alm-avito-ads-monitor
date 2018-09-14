@@ -510,20 +510,6 @@ class Alm_Avito_Ads_Monitor {
         if ( $this->avito_enable_option ) {
             $this->alio_parse_avito();
         }
-
-        //$this->cron_testing();
-    }
-
-    public function cron_testing() {
-        $msg  = 'cron test';
-        $my_post = array(
-            'post_title' => '>>> Report on the work of Cron ' . date('Y-m-d H:i:s'),
-            'post_content' => $msg,
-            'post_status' => 'publish',
-            'post_author' => 1,
-            'post_category' => array(0)
-        );
-        wp_insert_post( $my_post );
     }
 
     /**
