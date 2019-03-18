@@ -315,9 +315,14 @@ class Alm_Avito_Ads_Monitor {
                     if (!empty($exclude_arr) && in_array($avito_item_id, $exclude_arr)) continue;
 
                     $bad_symbols = array('background-image: url(', ')', ';');
-                    $img_from_ul_style = $item_table->find('a.large-picture .item-slider-list .item-slider-item:eq(0) div.item-slider-image')->attr('style');
-                    $img_from_ul_srcpath = $item_table->find('a.large-picture .item-slider-list .item-slider-item:eq(0) div.item-slider-image')->attr('data-srcpath');
-                    $img_from_a = $item_table->find('a.large-picture img.large-picture')->attr('src');
+
+                    $img_from_ul = $item_table->find('.item-slider-list .item-slider-item:eq(0) div.item-slider-image img.large-picture-img')->attr('src');
+
+                    // maybe they will return it - where src is find in 'style' and 'srcpath' attrs
+                    $img_from_ul_style = $item_table->find('.item-slider-list .item-slider-item:eq(0) div.item-slider-image')->attr('style');
+                    $img_from_ul_srcpath = $item_table->find('.item-slider-list .item-slider-item:eq(0) div.item-slider-image')->attr('data-srcpath');
+                    $img_from_ul_or_a = (empty($img_from_ul)) ? $item_table->find('a.large-picture-img')->attr('src') : $img_from_ul;
+
                     $item_title = $item_table->find('div.item_table-header > h3 > a span')->text();
                     $item_link = $item_table->find('div.item_table-header > h3 > a')->attr('href');
                     if ($item_link) {
@@ -325,15 +330,16 @@ class Alm_Avito_Ads_Monitor {
                     }
                     $item_price = $item_table->find('div.item_table-header span.price')->html();
 
-                    if ($img_from_ul_style && !$img_from_ul_srcpath) {
+                    if ($img_from_ul_or_a) {
+                        $img_from_ul_or_a = str_replace(array('//', 'https://', 'http://'), 'http://', $img_from_ul_or_a);
+                        $this->avito_monitor_data[$avito_item_id]['image'] = '<img alt="" src="' . $img_from_ul_or_a . '">';
+                    } elseif ($img_from_ul_style && !$img_from_ul_srcpath) {
                         $img_from_ul_style = 'http:' . str_replace($bad_symbols, '', $img_from_ul_style);
                         $this->avito_monitor_data[$avito_item_id]['image'] = '<img alt="" src="' . $img_from_ul_style . '">';
                     } elseif ($img_from_ul_srcpath) {
                         $this->avito_monitor_data[$avito_item_id]['image'] = '<img alt="" src="http:' . $img_from_ul_srcpath . '">';
-                    } elseif ($img_from_a) {
-                        $img_from_a = str_replace(array('//', 'https://', 'http://'), 'http://', $img_from_a);
-                        $this->avito_monitor_data[$avito_item_id]['image'] = '<img alt="" src="' . $img_from_a . '">';
                     }
+
                     $this->avito_monitor_data[$avito_item_id]['keyword'] = $key;
                     $this->avito_monitor_data[$avito_item_id]['description'] = '<div><h3><a href="' . $item_link . '" target="blank">' . $item_title . '</a></h3>' . $item_price . '</div>';
                 }

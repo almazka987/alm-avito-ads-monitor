@@ -264,10 +264,15 @@ class Alm_Avito_Ads_Monitor_Settings {
                 foreach ($keywords as $k_word) {
                     $out .= '<div class="table-header"><h4 class="keyword-heading">' . __('Keyword: ', 'alm-avito-ads-monitor') . $k_word . '</h4></div>';
                     $out .= '<div class="table-scrolling-container"><div class="last-monitor-table" data-keyword="' . $k_word . '">';
+// error_log(print_R('$k_word', true));
+// error_log(print_R($k_word, true));
+
                     if (!empty($new_data)) {
                         foreach ($new_data as $item_id => $item) {
                             if ($item['keyword'] == $k_word) {
                                 $img = isset( $item['image'] ) ? $item['image'] : '';
+// error_log(print_R('$img', true));
+// error_log(print_R($img, true));
                                 $out .= '<div class="row new item-block item' . $item_id . '"><div class="cell monitor-item image">' . $img . '</div><div class="cell monitor-item">' . $item['description'] . '</div><div class="cell monitor-item"><div class="bulk-checkbox-holder"><label class="checkcontainer"><strong class="bulk-checkbox-title">' . __( 'Exclude from monitoring', 'alm-avito-ads-monitor') . '</strong><input type="checkbox" name="bulk-exclude-checks" data-exclude-id="' . $item_id . '"></label></div></div></div>';
                             }
                         }
@@ -275,6 +280,8 @@ class Alm_Avito_Ads_Monitor_Settings {
                     if (!empty($other_data)) {
                         foreach ($other_data as $item_id => $item) {
                             $img = isset( $item['image'] ) ? $item['image'] : '';
+// error_log(print_R('$img', true));
+// error_log(print_R($img, true));
                             $dscr = isset( $item['description'] ) ? $item['description'] : '';
                             if ($item['keyword'] == $k_word) {
                                 $out .= '<div class="row item-block item' . $item_id . '"><div class="cell monitor-item image">' . $img . '</div><div class="cell monitor-item">' . $dscr . '</div><div class="cell monitor-item"><div class="bulk-checkbox-holder"><label class="checkcontainer"><strong class="bulk-checkbox-title">' . __( 'Exclude from monitoring', 'alm-avito-ads-monitor') . '</strong><input type="checkbox" name="bulk-exclude-checks" data-exclude-id="' . $item_id . '"></label></div></div></div>';
