@@ -323,7 +323,7 @@ class Alm_Avito_Ads_Monitor {
                     $img_from_ul_srcpath = $item_table->find('.item-slider-list .item-slider-item:eq(0) div.item-slider-image')->attr('data-srcpath');
                     $img_from_ul_or_a = (empty($img_from_ul)) ? $item_table->find('a.large-picture img.large-picture-img')->attr('src') : $img_from_ul;
 
-                    $item_title = $item_table->find('div.item_table-header > h3 > a span')->text();
+                    $item_title = $item_table->find('div.item_table-header > h3 > a')->attr('title');
                     $item_link = $item_table->find('div.item_table-header > h3 > a')->attr('href');
                     if ($item_link) {
                         $item_link = 'https://www.avito.ru/' . $item_link;
