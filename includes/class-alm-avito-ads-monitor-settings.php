@@ -95,8 +95,15 @@ class Alm_Avito_Ads_Monitor_Settings {
             'description'           => '',
             'fields'                => array(
                 array(
-                    'id' 			=> 'avito_enable',
-                    'label'			=> __( 'Enable Avito Ads Monitoring', 'alm-avito-ads-monitor' ),
+                    'id'            => 'avito_enable',
+                    'label'         => __( 'Enable Avito Ads Monitoring', 'alm-avito-ads-monitor' ),
+                    'description'   => __( '' ),
+                    'type'          => 'checkbox',
+                    'default'       => ''
+                ),
+                array(
+                    'id' 			=> 'avito_test_mode',
+                    'label'			=> __( 'Enable Test Mode (Force parsing every page update)', 'alm-avito-ads-monitor' ),
                     'description'	=> __( '' ),
                     'type'			=> 'checkbox',
                     'default'		=> ''
@@ -190,7 +197,7 @@ class Alm_Avito_Ads_Monitor_Settings {
 
 				$html .= '<p class="submit">' . "\n";
 					$html .= '<input type="hidden" name="tab" value="" />' . "\n";
-					$html .= '<input name="Submit" type="submit" class="button-primary" value="' . esc_attr( __( 'Save Settings' , 'alm-avito-ads-monitor' ) ) . '" />' . "\n";
+                    $html .= '<input name="Submit" type="submit" class="button-primary" value="' . esc_attr( __( 'Save Settings' , 'alm-avito-ads-monitor' ) ) . '" />' . "\n";
 				$html .= '</p>' . "\n";
 			$html .= '</form>' . "\n";
 

@@ -74,7 +74,8 @@ class Alm_Avito_Ads_Monitor {
 	 * @access  public
 	 * @since   1.0.0
 	 */
-	public $avito_enable_option;
+    public $avito_enable_option;
+	public $avito_test_mode_option;
     public $avito_city_option;
     public $avito_email_option;
     public $avito_keys_option;
@@ -145,6 +146,7 @@ class Alm_Avito_Ads_Monitor {
      */
     public function upd_avito_options() {
         $this->avito_enable_option = get_option('aam_avito_enable');
+        $this->avito_test_mode_option = get_option('aam_avito_test_mode');
         $this->avito_city_option = $this->transliterate( $this->clear( get_option('aam_avito_city') ) );
         $this->avito_keys_option = get_option('aam_avito_keys');
         $this->avito_email_option = get_option('aam_avito_email');
@@ -271,8 +273,8 @@ class Alm_Avito_Ads_Monitor {
      * @return string
      */
     public function transliterate( $string ) {
-        $roman = array("Sch","sch",'Yo','Zh','Kh','Ts','Ch','Sh','Yu','ya','yo','zh','kh','ts','ch','sh','yu','ya','A','B','V','G','D','E','Z','I','Y','K','L','M','N','O','P','R','S','T','U','F','','Y','','E','a','b','v','g','d','e','z','i','y','k','l','m','n','o','p','r','s','t','u','f','','y','','e');
-        $cyrillic = array("Щ","щ",'Ё','Ж','Х','Ц','Ч','Ш','Ю','я','ё','ж','х','ц','ч','ш','ю','я','А','Б','В','Г','Д','Е','З','И','Й','К','Л','М','Н','О','П','Р','С','Т','У','Ф','Ь','Ы','Ъ','Э','а','б','в','г','д','е','з','и','й','к','л','м','н','о','п','р','с','т','у','ф','ь','ы','ъ','э');
+        $roman = array("_","Sch","sch",'Yo','Zh','Kh','Ts','Ch','Sh','Yu','ya','yo','zh','kh','ts','ch','sh','yu','ya','A','B','V','G','D','E','Z','I','Y','K','L','M','N','O','P','R','S','T','U','F','','Y','','E','a','b','v','g','d','e','z','i','y','k','l','m','n','o','p','r','s','t','u','f','','y','','e');
+        $cyrillic = array(" ","Щ","щ",'Ё','Ж','Х','Ц','Ч','Ш','Ю','я','ё','ж','х','ц','ч','ш','ю','я','А','Б','В','Г','Д','Е','З','И','Й','К','Л','М','Н','О','П','Р','С','Т','У','Ф','Ь','Ы','Ъ','Э','а','б','в','г','д','е','з','и','й','к','л','м','н','о','п','р','с','т','у','ф','ь','ы','ъ','э');
         return str_replace( $cyrillic, $roman, $string );
     }
 
@@ -296,11 +298,16 @@ class Alm_Avito_Ads_Monitor {
         $city = $this->avito_city_option ?: '';
         $p_request = ( $page == 0 ) ? '' : 'p=' . $page . '&';
         $url = 'https://www.avito.ru/' . $city . '?' . $p_request . 'q=' . $key;
-
         $key_id = $this->transliterate( $this->clear( $key ) );
-        $file = file_get_contents( $url );
 
-        if ( $doc = phpQuery::newDocumentHTML( $file, 'utf-8' ) ) {
+        $file_headers = get_headers($url);
+        if (strpos($file_headers[0], '404') !== false) {
+            $file = false;
+        } else {
+            $file = file_get_contents( $url );
+        }
+
+        if ( $file && $doc = phpQuery::newDocumentHTML( $file, 'utf-8' ) ) {
 
             if ( $page == 0 ) {
                 $cnt = $doc->find('div.pagination-pages > a.pagination-page' )->count();
@@ -310,6 +317,7 @@ class Alm_Avito_Ads_Monitor {
                 foreach ($doc->find('div.item.item_table') as $item_table) {
                     $item_table = pq($item_table);
                     $avito_item_id = $key_id . $item_table->attr('id');
+
                     $exclude_arr = !empty($this->avito_db_data[0]->exclude_items) ? json_decode($this->avito_db_data[0]->exclude_items, true) : array();
 
                     if (!empty($exclude_arr) && in_array($avito_item_id, $exclude_arr)) continue;
@@ -462,7 +470,9 @@ class Alm_Avito_Ads_Monitor {
 
         $subject = __( 'Avito Parsing Info', 'alm-avito-ads-monitor' );
         $headers = "Content-Type: text/html \r\n From: Alm Avito Ads Monitor <noanswer@". $_SERVER['HTTP_HOST'] .">" . "\r\n";
-        wp_mail( $this->avito_email_option, $subject, $msg, $headers );
+        if (function_exists('wp_mail')) {
+            wp_mail( $this->avito_email_option, $subject, $msg, $headers );
+        }
     }
 
     /**
@@ -488,8 +498,13 @@ class Alm_Avito_Ads_Monitor {
      * @return void
      */
     public function load_searching () {
-        add_filter( 'cron_schedules', array( $this, 'alio_interval' ) );
-        add_action( 'cron_daily', array( $this, 'alio_cron_daily' ) );
+        //test for every update loading
+        if ( $this->avito_test_mode_option ) {
+            $this->alio_parse_avito();
+        } else {
+            add_filter( 'cron_schedules', array( $this, 'alio_interval' ) );
+            add_action( 'cron_daily', array( $this, 'alio_cron_daily' ) );
+        }
     }
 
     public function alio_cron_activation () {
