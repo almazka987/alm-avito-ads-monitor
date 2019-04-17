@@ -249,7 +249,7 @@ class Alm_Avito_Ads_Monitor_Settings {
     public function avito_last_monitor_results() {
         $out = '';
 
-        if ( !empty( $this->parent->avito_db_data ) && !empty( $this->parent->avito_keys_option ) && $this->parent->avito_enable_option && !$this->parent->blocked ) {
+        if ( !empty( $this->parent->avito_db_data ) && !empty( $this->parent->avito_keys_option ) && $this->parent->avito_enable_option && !$this->parent->avito_block_status ) {
             $new_data = json_decode($this->parent->avito_db_data[0]->new_data, true);
             $all_data = json_decode($this->parent->avito_db_data[0]->data, true);
 
@@ -295,8 +295,8 @@ class Alm_Avito_Ads_Monitor_Settings {
             $out .= '<div class="footer-block last-monitor-option-table"><div class="row"><div class="cell"></div><div class="cell"></div><div class="cell"><button class="button-primary js-bulk-avito-exclude">' . __( 'Bulk Exclude Items', 'alm-avito-ads-monitor') . '</button></div></div></div>';
             $out .= '</div></div>';
         }
-        if ( $this->parent->blocked ) {
-            $out .= __( 'It seems that you are too frequently changed settings and the site Avito this activity seemed suspicious. There is nothing to worry, just go to the site avito and confirm that you are not a robot - ', 'alm-avito-ads-monitor' ) . '<a href="https://www.avito.ru">' . __( 'go to avito website' ) . '</a>';
+        if ( $this->parent->avito_block_status ) {
+            $out .= __( 'It seems that you are too frequently changed settings and the site Avito this activity seemed suspicious. There is nothing to worry, just go to the site avito and confirm that you are not a robot - ', 'alm-avito-ads-monitor' ) . '<a href="https://www.avito.ru" target="blank">' . __( 'go to avito website' ) . '</a>';
         }
         return $out;
 	}

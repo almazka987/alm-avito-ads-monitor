@@ -81,15 +81,8 @@ class Alm_Avito_Ads_Monitor {
     public $avito_keys_option;
     public $avito_keywords_array;
     public $avito_db_data;
+    public $avito_block_status;
     public $avito_monitor_data;
-
-    /**
-     * Block our IP on Avito ru
-     * @var     bool
-     * @access  public
-     * @since   1.0.0
-     */
-    public $blocked;
 
     /**
      * Constructor function.
@@ -102,7 +95,6 @@ class Alm_Avito_Ads_Monitor {
         date_default_timezone_set('Europe/Moscow');
         $this->_version = $version;
         $this->_token = 'alm_avito_ads_monitor';
-        $this->blocked = false;
 
         // Load plugin environment variables
         $this->file = $file;
@@ -119,6 +111,7 @@ class Alm_Avito_Ads_Monitor {
         // Create DB table
         $this->db_install();
         $this->upd_avito_db_data();
+        $this->avito_block_status = !empty($this->avito_db_data[0]->block_status) ? $this->avito_db_data[0]->block_status : false;
 
         register_activation_hook( $this->file, array( $this, 'install' ) );
         register_activation_hook( $this->file, array( $this, 'alio_cron_activation' ) );
@@ -240,6 +233,7 @@ class Alm_Avito_Ads_Monitor {
             $sql = "CREATE TABLE $table_name (
                 id int(11) NOT NULL AUTO_INCREMENT,
                 search_date datetime NOT NULL,
+                block_status boolean NOT NULL,
                 site tinytext NOT NULL,
                 data longtext NOT NULL,
                 new_data longtext NOT NULL,
@@ -299,21 +293,22 @@ class Alm_Avito_Ads_Monitor {
         $p_request = ( $page == 0 ) ? '' : 'p=' . $page . '&';
         $url = 'https://www.avito.ru/' . $city . '?' . $p_request . 'q=' . $key;
         $key_id = $this->transliterate( $this->clear( $key ) );
-
-        $file_headers = get_headers($url);
+        
+        // check for headers
+        $file_headers = get_headers($url, 1);
         if (strpos($file_headers[0], '404') !== false) {
             $file = false;
         } else {
-            $file = file_get_contents( $url );
+            $file = file_get_contents($url);
         }
 
-        if ( $file && $doc = phpQuery::newDocumentHTML( $file, 'utf-8' ) ) {
+        if ( $file && $doc = phpQuery::newDocumentHTML($file, 'utf-8')) {
 
             if ( $page == 0 ) {
                 $cnt = $doc->find('div.pagination-pages > a.pagination-page' )->count();
             }
 
-            if ( $doc->find('div.item.item_table') ) {
+            if ( $doc->find('div.item.item_table')->count() > 0) {
                 foreach ($doc->find('div.item.item_table') as $item_table) {
                     $item_table = pq($item_table);
                     $avito_item_id = $key_id . $item_table->attr('id');
@@ -349,10 +344,11 @@ class Alm_Avito_Ads_Monitor {
                     }
 
                     $this->avito_monitor_data[$avito_item_id]['keyword'] = $key;
+                    $this->avito_monitor_data[$avito_item_id]['item_title'] = $item_title;
                     $this->avito_monitor_data[$avito_item_id]['description'] = '<div><h3><a href="' . $item_link . '" target="blank">' . $item_title . '</a></h3>' . $item_price . '</div>';
                 }
             } else {
-                $this->blocked = true;
+                $this->avito_block_status = true;
             }
         }
 
@@ -382,6 +378,7 @@ class Alm_Avito_Ads_Monitor {
     public function alio_parse_avito() {
         $site = 'avito';
         $search_date = time();
+
         foreach ( $this->avito_keywords_array as $key ) {
             $pages_count = $this->lets_parse_avito_page( $key, 0 );
 
@@ -401,6 +398,7 @@ class Alm_Avito_Ads_Monitor {
             $wpdb->insert( $wpdb->prefix . 'alm_ads_monitor', array(
                 'ID' => '',
                 'search_date' => date('Y/m/d H:i:s', $search_date ),
+                'block_status' => $this->avito_block_status,
                 'site' => $site,
                 'data' => json_encode( $this->avito_monitor_data, JSON_UNESCAPED_UNICODE ),
                 'new_data' => json_encode( $new_data, JSON_UNESCAPED_UNICODE ),
@@ -408,6 +406,7 @@ class Alm_Avito_Ads_Monitor {
         } else {
             $wpdb->update( $wpdb->prefix . 'alm_ads_monitor', array(
                 'search_date' => date('Y/m/d H:i:s', $search_date ),
+                'block_status' => false,
                 'site' => $site,
                 'data' => json_encode( $this->avito_monitor_data, JSON_UNESCAPED_UNICODE ),
                 'new_data' => json_encode( $new_data, JSON_UNESCAPED_UNICODE ),
@@ -475,6 +474,21 @@ class Alm_Avito_Ads_Monitor {
         }
     }
 
+     /**
+     * Give simple variant of data array for visual check
+     * @return array
+     */
+    public function get_simple_data_arr($arr) {
+        $out = array();
+        foreach ($arr as $key => $value) {
+            ;
+            if (isset($value['item_title'])) {
+                $out[] = array('id' => $key, 'title' => $value['item_title']);
+            }
+        }
+        return $out;
+    }
+
     /**
      * Check Avito saved data and enable to replace or not
      * @return array
@@ -484,6 +498,7 @@ class Alm_Avito_Ads_Monitor {
         if ( !empty( $this->avito_db_data ) ) {
             $data_from_db = json_decode( $this->avito_db_data[0]->data, true );
             $diff_arr = array_diff_key( $this->avito_monitor_data, $data_from_db );
+
             if ( !empty( $diff_arr ) ) {
                 $res_arr = $diff_arr;
             }
