@@ -229,7 +229,7 @@ class Alm_Avito_Ads_Monitor {
         $table_name = $wpdb->prefix . 'alm_ads_monitor';
         if( !$wpdb->get_var("SHOW TABLES LIKE '$table_name'") ) {
             $charset_collate = $wpdb->get_charset_collate();
-    
+
             $sql = "CREATE TABLE $table_name (
                 id int(11) NOT NULL AUTO_INCREMENT,
                 search_date datetime NOT NULL,
@@ -240,7 +240,7 @@ class Alm_Avito_Ads_Monitor {
                 exclude_items text NOT NULL,
                 PRIMARY KEY  (id)
                 ) $charset_collate;";
-    
+
             require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
             dbDelta( $sql );
         }
@@ -293,7 +293,7 @@ class Alm_Avito_Ads_Monitor {
         $p_request = ( $page == 0 ) ? '' : 'p=' . $page . '&';
         $url = 'https://www.avito.ru/' . $city . '?' . $p_request . 'q=' . $key;
         $key_id = $this->transliterate( $this->clear( $key ) );
-        
+
         // check for headers
         $file_headers = get_headers($url, 1);
         if (strpos($file_headers[0], '404') !== false) {
@@ -331,10 +331,9 @@ class Alm_Avito_Ads_Monitor {
                     if ($item_link) {
                         $item_link = 'https://www.avito.ru/' . $item_link;
                     }
-                    $item_price = $item_table->find('div.item_table-header span.price')->html();
+                    $item_price = $item_table->find('div.item_table-header span.snippet-price')->html();
 
                     if ($img_from_ul_or_a) {
-                        $img_from_ul_or_a = str_replace(array('//', 'https://', 'http://'), 'http://', $img_from_ul_or_a);
                         $this->avito_monitor_data[$avito_item_id]['image'] = '<img alt="" src="' . $img_from_ul_or_a . '">';
                     } elseif ($img_from_ul_style && !$img_from_ul_srcpath) {
                         $img_from_ul_style = 'http:' . str_replace($bad_symbols, '', $img_from_ul_style);
@@ -391,7 +390,7 @@ class Alm_Avito_Ads_Monitor {
 
         global $wpdb;
         $wpdb->show_errors( true );
-        
+
         $new_data = $this->avito_search_new();
 
         if ( empty( $this->avito_db_data ) ) {
