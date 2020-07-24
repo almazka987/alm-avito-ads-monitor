@@ -291,7 +291,7 @@ class Alm_Avito_Ads_Monitor {
         $cnt = 0;
         $city = $this->avito_city_option ?: '';
         $p_request = ( $page == 0 ) ? '' : 'p=' . $page . '&';
-        $url = 'https://www.avito.ru/' . $city . '?' . $p_request . 'q=' . $key;
+        $url = 'https://www.avito.ru/' . $city . '?' . $p_request . 'q=' . urlencode( $key );
         $key_id = $this->transliterate( $this->clear( $key ) );
 
         // check for headers
