@@ -327,6 +327,7 @@ class Alm_Avito_Ads_Monitor {
                     $img_from_ul_or_a = (empty($img_from_ul)) ? $item_table->find('a.large-picture img.large-picture-img')->attr('src') : $img_from_ul;
 
                     $item_title = $item_table->find('div.item_table-wrapper h3.snippet-title > a')->attr('title');
+                    $item_address = $item_table->find('span.item-address-georeferences-item__content')->html();
                     $item_link = $item_table->find('div.item_table-wrapper h3.snippet-title > a')->attr('href');
                     if ($item_link) {
                         $item_link = 'https://www.avito.ru/' . $item_link;
@@ -344,7 +345,7 @@ class Alm_Avito_Ads_Monitor {
 
                     $this->avito_monitor_data[$avito_item_id]['keyword'] = $key;
                     $this->avito_monitor_data[$avito_item_id]['item_title'] = $item_title;
-                    $this->avito_monitor_data[$avito_item_id]['description'] = '<div><h3><a href="' . $item_link . '" target="blank">' . $item_title . '</a></h3>' . $item_price . '</div>';
+                    $this->avito_monitor_data[$avito_item_id]['description'] = '<div><h3><a href="' . $item_link . '" target="blank">' . $item_title . '</a></h3>' . $item_price . '<div>' . $item_address . '</div></div>';
                 }
             } else {
                 $this->avito_block_status = true;
