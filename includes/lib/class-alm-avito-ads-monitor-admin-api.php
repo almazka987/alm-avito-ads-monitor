@@ -130,11 +130,18 @@ class Alm_Avito_Ads_Monitor_Admin_API {
             case 'select':
                 $html .= '<select name="' . esc_attr( $option_name ) . '" id="' . esc_attr( $field['id'] ) . '">';
                 foreach ( $field['options'] as $k => $v ) {
+                    $level = substr_count($k, "/");
+                    $spaces = '';
                     $selected = false;
+
+                    for ( $i=1; $i<=$level; $i++ ) {
+                        $spaces .= '&nbsp;&nbsp;';
+                    }
+
                     if ( $k == $data ) {
                         $selected = true;
                     }
-                    $html .= '<option ' . selected( $selected, true, false ) . ' value="' . esc_attr( $k ) . '">' . $v . '</option>';
+                    $html .= '<option ' . selected( $selected, true, false ) . ' value="' . esc_attr( $k ) . '">' . $spaces . $v . '</option>';
                 }
                 $html .= '</select> ';
                 break;

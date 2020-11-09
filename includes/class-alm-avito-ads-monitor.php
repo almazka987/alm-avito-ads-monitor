@@ -77,6 +77,7 @@ class Alm_Avito_Ads_Monitor {
     public $avito_enable_option;
 	public $avito_test_mode_option;
     public $avito_city_option;
+    public $avito_category_option;
     public $avito_email_option;
     public $avito_keys_option;
     public $avito_keywords_array;
@@ -141,6 +142,7 @@ class Alm_Avito_Ads_Monitor {
         $this->avito_enable_option = get_option('aam_avito_enable');
         $this->avito_test_mode_option = get_option('aam_avito_test_mode');
         $this->avito_city_option = $this->transliterate( $this->clear( get_option('aam_avito_city') ) );
+        $this->avito_category_option = get_option('aam_avito_category');
         $this->avito_keys_option = get_option('aam_avito_keys');
         $this->avito_email_option = get_option('aam_avito_email');
         $this->avito_keywords_array = $this->get_keys_array($this->avito_keys_option);
@@ -289,9 +291,10 @@ class Alm_Avito_Ads_Monitor {
      */
     public function lets_parse_avito_page( $key, $page ) {
         $cnt = 0;
+        $category = ( $this->avito_category_option != "any" ) ? $this->avito_category_option : '';
         $city = $this->avito_city_option ?: '';
         $p_request = ( $page == 0 ) ? '' : 'p=' . $page . '&';
-        $url = 'https://www.avito.ru/' . $city . '?' . $p_request . 'q=' . urlencode( $key );
+        $url = 'https://www.avito.ru/' . $city . $category . '?' . $p_request . 'q=' . urlencode( $key );
         $key_id = $this->transliterate( $this->clear( $key ) );
 
         // check for headers
