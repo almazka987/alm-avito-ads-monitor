@@ -291,7 +291,7 @@ class Alm_Avito_Ads_Monitor {
      */
     public function lets_parse_avito_page( $key, $page ) {
         $cnt = 0;
-        $category = ( $this->avito_category_option != "any" ) ? $this->avito_category_option : '';
+        $category = ( $this->avito_category_option != "any" ) ? '/' . $this->avito_category_option : '';
         $city = $this->avito_city_option ?: '';
         $p_request = ( $page == 0 ) ? '' : 'p=' . $page . '&';
         $url = 'https://www.avito.ru/' . $city . $category . '?' . $p_request . 'q=' . urlencode( $key );
