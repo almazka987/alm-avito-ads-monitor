@@ -418,7 +418,7 @@ class Alm_Avito_Ads_Monitor {
         $this->upd_avito_db_data();
 
         if ( $this->avito_email_option && !empty( $new_data ) ) {
-            $this->avito_send_mail(); //for testing use add_action( 'plugins_loaded', array( $this, 'avito_send_mail' ) );
+            $this->avito_send_mail(); //for testing use add_action( 'plugins_loaded', array( $this, 'avito_send_mail' ) ); in __construct of this file
         }
 
     }
